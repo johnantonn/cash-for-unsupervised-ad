@@ -10,3 +10,6 @@ output/*
 # Exceptions
 !input/.gitkeep
 !output/.gitkeep
+
+# __pycache__
+**/__pycache__/
