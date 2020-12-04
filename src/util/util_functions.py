@@ -34,7 +34,7 @@ def import_kddcup99(filename):
 
     return df
 
-def split_df(df):
+def split_df_kddcup99(df):
     """ Function that splits a dataframe and returns training, validation and test sets.
 
     Args:

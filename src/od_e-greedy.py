@@ -16,7 +16,7 @@ load_dotenv()
 df = import_kddcup99(os.getenv('dataset'))
 
 # Split dataset to train, validation and test
-y_train, X_train, y_validation, X_validation, y_test, X_test = split_df(df)
+y_train, X_train, y_validation, X_validation, y_test, X_test = split_df_kddcup99(df)
 
 # Define algorithm parameters
 timeout = 60.0 # time budget
@@ -63,11 +63,16 @@ while True:
   roc_auc = np.round(roc_auc_score(y_validation, y_validation_scores), decimals=4)
   sum_of_rewards += roc_auc
   idx = np.where(actions == k)
-  action_values[idx] = roc_auc
-  
+  # Q(A) <- Q(A) + 1/N(A)[R - Q(A)]
+  if(np.sum(action_values == k) != 0.0):
+    action_values[idx] = action_values[idx] + (1/np.sum(action_values == k))(roc_auc - action_values[idx])
+  else:
+    action_values[idx] = roc_auc
+
   # Print new state
   print('\t\tactions:', actions)
   print('\t\taction_values:', action_values)
+  print('\t\tselected_actions:', selected_actions)
 
   # Update the best action (model)
   max_index = action_values.argmax()
