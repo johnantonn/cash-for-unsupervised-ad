@@ -30,7 +30,7 @@ X_test = test_df.drop(columns=['id', 'outlier'])
 
 # train LOF detector
 clf_name = 'LOF'
-clf = LOF(n_neighbors=50)
+clf = LOF(n_neighbors=10)
 clf.fit(X_train)
 
 # get the prediction labels and outlier scores of the training data

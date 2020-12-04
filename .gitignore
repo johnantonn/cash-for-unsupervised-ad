@@ -1,8 +1,12 @@
 # VS Code
 .vscode
 
-# Dataset files
-datasets/*
+# Input files
+input/*
 
-# exception to the rule
-!datasets/.gitkeep 
+# Output files
+output/*
+
+# Exceptions
+!input/.gitkeep
+!output/.gitkeep

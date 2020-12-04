@@ -63,7 +63,7 @@ while True:
 
   # get the prediction on the test data
   y_test_pred = clf.predict(X_test)  # outlier labels (0 or 1)
-  y_test_scores = clf.decision_function(X_test)  # outlier scores
+  y_test_scores = clf.decision_function(X_test)*(-1)  # outlier scores
 
   roc_auc = np.round(roc_auc_score(y_test, y_test_scores), decimals=4)
   sum_of_rewards += roc_auc
