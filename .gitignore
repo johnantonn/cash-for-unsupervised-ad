@@ -2,14 +2,10 @@
 .vscode
 
 # Input files
-input/*
-
-# Output files
-output/*
+data/*
 
 # Exceptions
-!input/.gitkeep
-!output/.gitkeep
+!data/.gitkeep
 
 # __pycache__
 **/__pycache__/

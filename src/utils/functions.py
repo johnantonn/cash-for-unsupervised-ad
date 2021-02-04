@@ -19,8 +19,8 @@ def import_kddcup99(filename):
         (df): The dataframe with the data contents
     """
 
-    # Build path to input directory
-    filepath = Path(dirname(dirname(dirname(__file__)))+"/input/"+filename)
+    # Build path to data directory
+    filepath = Path(dirname(dirname(dirname(__file__)))+"/data/"+filename)
 
     # If file does not exist
     if not os.path.exists(filepath):

@@ -8,7 +8,7 @@ from pyod.models.lof import LOF
 from pyod.models.knn import KNN
 from pyod.utils.data import generate_data
 from sklearn.metrics import roc_auc_score
-from util.util_functions import *
+from utils.functions import *
 
 # Load env
 load_dotenv()
