@@ -7,9 +7,9 @@ class Arm:
   Arm class representing OD models
   """
 
-  def __init__(self, model, model_params={}):
+  def __init__(self, model):
       self.model = model
-      self.model_params = model_params
+      self.model_params = self.model.get_params()
       self.count = 0
       self.reward = 0.0
 

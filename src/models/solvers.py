@@ -5,11 +5,11 @@ Solver functions for selecting bandit arms
 import math, random
 import numpy as np
 
-def random(K):
+def random_(K):
     """
     K = the number of arms (domains)
     """
-    
+    print('\t\tRandom selection.')
     index = {i: random.random() for i in range(K)}
     return index
 
@@ -31,7 +31,7 @@ def ucb(K, t, counts, R):
         
     return index
 
-def egreedy(K, t, R, epsilon=0.3, decay=False):
+def egreedy(K, t, R, epsilon=0.1, decay=False):
     """
     K = the number of arms (domains)
     t = current timestep

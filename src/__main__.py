@@ -5,12 +5,16 @@ import pandas as pd
 from dotenv import load_dotenv
 from pyod.models.lof import LOF
 from pyod.models.knn import KNN
+from pyod.models.iforest import IForest
+from pyod.models.cblof import CBLOF
+from pyod.models.copod import COPOD
 from pyod.utils.data import generate_data
 from sklearn.metrics import roc_auc_score
 from utils.functions import *
 from models.bandit import Bandit
+from models.arm import Arm
 
-def main(): 
+def main():
     # Load env
     load_dotenv()
 
@@ -20,32 +24,38 @@ def main():
     # Split dataset to train, validation and test
     y_train, X_train, y_validation, X_validation, y_test, X_test = split_df_kddcup99(df)
 
-    # Define bandit
-    od_bandit = Bandit(2)
+    # Define arms
+    arms = np.array([Arm(LOF()), Arm(KNN()), Arm(IForest()), Arm(CBLOF()), Arm(COPOD())])
 
-    # Define algorithm parameters
-    timeout = 180 # time budget
+    # Create bandit
+    od_bandit = Bandit(K=len(arms), arms=arms, solver='egreedy')
+
+    # Define time budget
+    timeout = float(os.getenv('timeout'))
 
     # Begin bandit loop
     print('Bandit started...')
     while True:
 
+        # print loop counter
         print('\tIteration:', len(od_bandit.policy)+1)
 
-        # Select arm
+        # select arm
         arm_index = od_bandit.select_arm()
         print('\t\tSelected arm:', arm_index)
 
-        # Play arm
+        # play arm
         od_bandit.play_arm(arm_index, X_train, X_validation, y_validation)
 
-        # Print new state
+        # print policy
         print('\t\tpolicy:', od_bandit.policy)
+        # Print rewards
         print('\t\trewards:', od_bandit.rewards)
 
-        # Update best arm
+        # update best arm
         od_bandit.update_best_arm()
 
+        # check for timeout
         if od_bandit.total_time > timeout:
             break
 
