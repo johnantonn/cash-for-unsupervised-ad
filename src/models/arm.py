@@ -9,7 +9,7 @@ class Arm:
 
   def __init__(self, model):
       self.model = model
-      self.model_params = self.model.get_params()
+      self.model_params = []
       self.count = 0
       self.reward = 0.0
 
@@ -25,6 +25,7 @@ class Arm:
       y_validation_scores = self.model.decision_function(X_validation)  # outlier scores
       ret_dict['reward'] = np.round(roc_auc_score(y_validation, y_validation_scores), decimals=4)
 
+  # not used right now
   def update_reward(self, R, r):
       # Q(A) <- Q(A) + 1/N(A)[R - Q(A)]
       if(np.sum(R) != 0):

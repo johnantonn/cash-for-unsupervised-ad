@@ -15,7 +15,7 @@ class Bandit:
     def __init__(self, K, arms, solver='random', solver_param={}):
 
         #parameters
-        self.t = -1
+        self.t = -1 # maybe: total_time / timeout ?
         self.K = int(K)
         self.total_time = 0.0
         # solver
@@ -24,6 +24,7 @@ class Bandit:
         # arms
         self.arms = arms # arms
         self.best_arm = None # best arm
+        self.best_params = {}
         # rewards
         self.counts = np.zeros(K, dtype=int)
         self.rewards = {i: [] for i in range(K)}
@@ -82,8 +83,8 @@ class Bandit:
             raise Exception('Invalid model')
         
         # Update model_params
-        self.arms[i].model_params = self.arms[i].model.get_params()
-        print('\t\tSampled model params:', self.arms[i].model_params)
+        print('\t\tSampled model params:', self.arms[i].model.get_params())
+        self.arms[i].model_params.append(self.arms[i].model.get_params())
 
         # pull arm
         start = time.time()
@@ -111,8 +112,12 @@ class Bandit:
 
     def update_best_arm(self):
         # the arm with the greatest mean(r)
-        index = {i: np.mean(r) for i, r in self.rewards.items()}
-        self.best_arm = self.arms[max(index, key=index.get)]
+        index = {i: np.mean(r) for i, r in self.rewards.items()} # by best mean reward across arms
+        best_arm_index = max(index, key=index.get)
+        self.best_arm = self.arms[best_arm_index]
+        # the params that yielded the best score
+        best_params_index = self.rewards[best_arm_index].index(max(self.rewards[best_arm_index])) # by best reward in the best arm
+        self.best_params = self.arms[best_arm_index].model_params[best_params_index]
 
     def get_policy_payoff(self):
         """ Compute the cumulative reward for the chosen policy """

@@ -28,7 +28,7 @@ def main():
     arms = np.array([Arm(LOF()), Arm(KNN()), Arm(IForest()), Arm(CBLOF())])
 
     # Create bandit
-    od_bandit = Bandit(K=len(arms), arms=arms, solver='ucb')
+    od_bandit = Bandit(K=len(arms), arms=arms, solver='egreedy')
 
     # Define time budget
     timeout = float(os.getenv('timeout'))
@@ -69,6 +69,7 @@ def main():
     # Apply the best model to the test set
     print('Applying the best model to the test data...')
     print('\tBest model: ', od_bandit.best_arm.model)
+    print('\tBest params: ', od_bandit.best_params)
     od_bandit.best_arm.model.fit(X_test)
 
     # Get the prediction on the test data
