@@ -25,7 +25,7 @@ def main():
     y_train, X_train, y_validation, X_validation, y_test, X_test = split_df_kddcup99(df)
 
     # Define arms
-    arms = np.array([Arm(LOF()), Arm(KNN()), Arm(IForest()), Arm(CBLOF())])
+    arms = np.array([Arm(LOF()), Arm(KNN()), Arm(IForest()), Arm(CBLOF()), Arm(COPOD())])
 
     # Create bandit
     od_bandit = Bandit(K=len(arms), arms=arms, solver='egreedy')

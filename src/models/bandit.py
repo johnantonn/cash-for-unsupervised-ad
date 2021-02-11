@@ -15,7 +15,7 @@ class Bandit:
     def __init__(self, K, arms, solver='random', solver_param={}):
 
         #parameters
-        self.t = -1 # maybe: total_time / timeout ?
+        self.t = -1
         self.K = int(K)
         self.total_time = 0.0
         # solver
@@ -34,6 +34,9 @@ class Bandit:
 
     def select_arm(self):
         """ Select the arm to pull next """
+
+        # increase time step
+        self.t += 1
 
         # play every arm at least once
         iz = np.where(self.counts == 0)[0]

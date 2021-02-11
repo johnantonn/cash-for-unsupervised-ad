@@ -25,14 +25,14 @@ def ucb(K, t, counts, R):
     for i, r in R.items():
         n_i = counts[i]
         mu_i = np.mean(r)
-        bound = np.sqrt((2 * np.log(n_i)) / n_i)
-        # bound = np.sqrt((2 * np.log(t)) / n_i)
         # At = Qt(A) + c*sqrt(lnt/Nt(a))
+        # bound = np.sqrt((2 * np.log(n_i)) / n_i)
+        bound = np.sqrt((2 * np.log(t)) / n_i)
         index[i] = mu_i + bound
         
     return index
 
-def egreedy(K, t, R, epsilon=0.1, decay=False):
+def egreedy(K, t, R, epsilon=0.1, decay=True):
     """
     K = the number of arms (domains)
     t = current timestep
