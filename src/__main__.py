@@ -25,10 +25,10 @@ def main():
     y_train, X_train, y_validation, X_validation, y_test, X_test = split_df_kddcup99(df)
 
     # Define arms
-    arms = np.array([Arm(LOF()), Arm(KNN()), Arm(IForest()), Arm(CBLOF()), Arm(COPOD())])
+    arms = np.array([Arm(LOF()), Arm(KNN()), Arm(IForest()), Arm(CBLOF())])
 
     # Create bandit
-    od_bandit = Bandit(K=len(arms), arms=arms, solver='egreedy')
+    od_bandit = Bandit(K=len(arms), arms=arms, solver='ucb')
 
     # Define time budget
     timeout = float(os.getenv('timeout'))

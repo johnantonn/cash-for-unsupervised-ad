@@ -25,8 +25,9 @@ def ucb(K, t, counts, R):
     for i, r in R.items():
         n_i = counts[i]
         mu_i = np.mean(r)
-        #bound = np.sqrt((2 * np.log(n_i)) / n_i)
-        bound = np.sqrt((2 * np.log(t)) / n_i)
+        bound = np.sqrt((2 * np.log(n_i)) / n_i)
+        # bound = np.sqrt((2 * np.log(t)) / n_i)
+        # At = Qt(A) + c*sqrt(lnt/Nt(a))
         index[i] = mu_i + bound
         
     return index
