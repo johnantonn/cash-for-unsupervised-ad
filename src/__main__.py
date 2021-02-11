@@ -32,6 +32,8 @@ def main():
 
     # Define time budget
     timeout = float(os.getenv('timeout'))
+    timeout_ratio = float(os.getenv('timeout_ratio'))
+    arm_timeout = timeout * timeout_ratio
 
     # Begin bandit loop
     print('Bandit started...')
@@ -45,10 +47,11 @@ def main():
         print('\t\tSelected arm:', arm_index)
 
         # play arm
-        od_bandit.play_arm(arm_index, X_train, X_validation, y_validation)
+        od_bandit.play_arm(arm_index, X_train, X_validation, y_validation, arm_timeout)
 
         # print policy
         print('\t\tpolicy:', od_bandit.policy)
+
         # Print rewards
         print('\t\trewards:', od_bandit.rewards)
 

@@ -4,6 +4,8 @@ from pyod.models.lof import LOF
 from pyod.models.knn import KNN
 from models.solvers import random_, ucb, egreedy
 from models.arm import Arm
+from multiprocessing import Process, Manager
+import time
 
 class Bandit:
     """
@@ -57,7 +59,7 @@ class Bandit:
 
         return i
     
-    def play_arm(self, i, X_train, X_validation, y_validation):
+    def play_arm(self, i, X_train, X_validation, y_validation, timeout):
         """ Play the selected arm """
 
         # Select parameters randomly
@@ -71,7 +73,7 @@ class Bandit:
         elif self.arms[i].model.__class__.__name__ == 'IForest':
             self.arms[i].model.n_estimators = random.randint(10,200)
         elif self.arms[i].model.__class__.__name__ == 'CBLOF':
-            self.arms[i].model.n_clusters = random.randint(3,20)
+            self.arms[i].model.n_clusters = random.randint(5,20)
             self.arms[i].model.alpha = random.uniform(0.5,1)
             self.arms[i].model.beta = random.randint(2,10)
         elif self.arms[i].model.__class__.__name__ == 'COPOD':
@@ -83,7 +85,24 @@ class Bandit:
         self.arms[i].model_params = self.arms[i].model.get_params()
         print('\t\tSampled model params:', self.arms[i].model_params)
 
-        r, t = self.arms[i].pull(X_train, X_validation, y_validation)
+        # pull arm
+        start = time.time()
+        manager = Manager()
+        return_dict = manager.dict()
+        p = Process(target=self.arms[i].pull, args=(X_train, X_validation, y_validation, return_dict))
+        p.start()
+        p.join(timeout)
+        p.terminate()
+        end = time.time()
+        print('\t\tPull arm elapsed time:', end-start)
+
+        if p.exitcode == 0:
+            r = return_dict['reward']
+            t = return_dict['elapsed_time']
+        elif p.exitcode is None:
+            r = 0.0
+            t = timeout
+
         self.rewards[i].append(r)
         self.policy_payoff = np.append(self.policy_payoff, r)
         self.counts[i] += 1

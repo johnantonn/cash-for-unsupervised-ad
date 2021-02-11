@@ -9,7 +9,7 @@ def random_(K):
     """
     K = the number of arms (domains)
     """
-    print('\t\tRandom selection.')
+    print('\t\tRandom selection')
     index = {i: random.random() for i in range(K)}
     return index
 
