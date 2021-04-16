@@ -13,4 +13,4 @@ The dataset used by this implementation is taken from [here](https://www.dbs.ifi
 The implementation makes use of the [PyOD](https://pyod.readthedocs.io/en/latest/index.html) package.
 
 ## License
-Copyright © 2020 Ioannis Antoniadis
+Copyright © 2021 Ioannis Antoniadis
