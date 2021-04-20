@@ -2,12 +2,32 @@
 
 import sys
 import os
+import itertools
+import decimal
 from dotenv import load_dotenv
 from scipy.io import arff
 import pandas as pd
 import numpy as np
 from pathlib import Path
 from os.path import dirname
+
+def round_num(num):
+    return round(num, 4)
+
+def float_range(start, stop, step):
+    while start < stop:
+        yield float(start)
+        start += decimal.Decimal(step)
+
+def print_shape(*args):
+    for arg in args:
+        print(arg.shape)
+
+def product_dict(**kwargs):
+    keys = kwargs.keys()
+    vals = kwargs.values()
+    for instance in itertools.product(*vals):
+        yield dict(zip(keys, instance))
 
 def import_dataset(filename):
     """ Function that reads the KDDCup99 dataset and returns a dataframe.
