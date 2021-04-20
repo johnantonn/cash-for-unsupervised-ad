@@ -9,7 +9,7 @@ import numpy as np
 from pathlib import Path
 from os.path import dirname
 
-def import_kddcup99(filename):
+def import_dataset(filename):
     """ Function that reads the KDDCup99 dataset and returns a dataframe.
 
     Args:
@@ -31,6 +31,8 @@ def import_kddcup99(filename):
     df = pd.DataFrame(data[0])
     df.outlier = df.outlier.str.decode("utf-8")
     df['outlier'] = df['outlier'].map({'yes':1,'no':0}) 
+    if 'id' in df:
+        del df['id']
 
     return df
 

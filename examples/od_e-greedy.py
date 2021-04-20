@@ -14,7 +14,7 @@ from utils.functions import *
 load_dotenv()
 
 # Import the dataset
-df = import_kddcup99(os.getenv('dataset'))
+df = import_dataset(os.getenv('dataset'))
 
 # Split dataset to train, validation and test
 y_train, X_train, y_validation, X_validation, y_test, X_test = split_df_kddcup99(df)
