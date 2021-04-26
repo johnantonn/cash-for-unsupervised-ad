@@ -82,13 +82,12 @@ def evaluate_model_instance(clf, hp, X_train, X_val, y_val):
     end_time = time.time()
     elapsed_time = round_num(end_time - start_time)
 
-    # get prediction on validation set
-    y_true, y_pred = y_val, clf.predict(X_val)
-
     # calculate scores
-    y_val_scores = clf.decision_function(X_val)  # outlier scores
-    f1 = round_num(f1_score(y_true, y_pred, average='weighted')) # f1
+    y_pred = clf.predict(X_val) # predict()
+    f1 = round_num(f1_score(y_val, y_pred)) # f1
+    y_val_scores = clf.decision_function(X_val) # decision_function()
     auc = round_num(roc_auc_score(y_val, y_val_scores)) # auc
+
     scores={"f1": f1, "auc": auc} # dict
-    
+
     return scores, elapsed_time

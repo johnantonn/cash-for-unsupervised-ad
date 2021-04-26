@@ -82,6 +82,7 @@ def find_best_model(dataset):
     
         # Increase timer
         total_time += fit_time
+        total_time = round_num(total_time)
 
     print("Elapsed time:", total_time)
     print('Best model:', best_model_name)
