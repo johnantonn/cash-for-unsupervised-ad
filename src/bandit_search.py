@@ -77,7 +77,7 @@ def main():
     y_test_scores = od_bandit.best_arm.model.decision_function(X_test)  # outlier scores
 
     roc_auc = np.round(roc_auc_score(y_test, y_test_scores), decimals=4)
-    print("\troc_auc on test set: ", roc_auc)
+    print('\troc_auc on test set: ', roc_auc)
 
-if __name__=="__main__": 
+if __name__=='__main__': 
     main()
