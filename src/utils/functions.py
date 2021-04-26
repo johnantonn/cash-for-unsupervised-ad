@@ -2,6 +2,7 @@
 
 import sys
 import os
+import time
 import itertools
 import decimal
 from dotenv import load_dotenv
@@ -10,6 +11,7 @@ import pandas as pd
 import numpy as np
 from pathlib import Path
 from os.path import dirname
+from sklearn.metrics import roc_auc_score, f1_score
 
 def round_num(num):
     return round(num, 4)
@@ -23,7 +25,6 @@ def subsample(df, n):
     if(len(df) > 5000):
         df = df.sample(n=5000)
     return df
-
 
 def product_dict(**kwargs):
     keys = kwargs.keys()
@@ -57,3 +58,37 @@ def import_dataset(filename):
         del df['id']
 
     return df
+
+def evaluate_model_instance(clf, hp, X_train, X_val, y_val):
+    ''' Function that applies a model instance and returns scores.
+
+    Args:
+        clf (model): the anomaly detection model/algorithm
+        hp (dict): the dict of hyperparameter instance values
+        X_train: training set
+        X_val: validation set
+        y_val: validation set labels
+
+    Returns:
+        scores (dict): The resulting scores
+        time (float): Elapsed time for fit method
+    '''
+    # set model params
+    clf.set_params(**hp)
+
+    # fit model and time it
+    start_time = time.time()
+    clf.fit(X_train)
+    end_time = time.time()
+    elapsed_time = round_num(end_time - start_time)
+
+    # get prediction on validation set
+    y_true, y_pred = y_val, clf.predict(X_val)
+
+    # calculate scores
+    y_val_scores = clf.decision_function(X_val)  # outlier scores
+    f1 = round_num(f1_score(y_true, y_pred, average='weighted')) # f1
+    auc = round_num(roc_auc_score(y_val, y_val_scores)) # auc
+    scores={"f1": f1, "auc": auc} # dict
+    
+    return scores, elapsed_time

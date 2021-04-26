@@ -5,9 +5,7 @@ import random
 import numpy as np
 from dotenv import load_dotenv
 # sklearn
-from sklearn.metrics import roc_auc_score, f1_score
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import classification_report
 # custom
 from utils.pyod_models import models
 from utils.datasets import datasets
@@ -50,7 +48,7 @@ def find_best_model(dataset):
     # Loop over models
     for key in models:
         print('\t', key)
-        best_scores, best_params = evaluate_model(
+        best_scores, best_params = evaluate_model_family(
             models[key]['instance'],
             models[key]['hyperparameters'],
             X_train,
@@ -70,7 +68,7 @@ def find_best_model(dataset):
     print('Best model params:', best_model_params)
     print('\n')
 
-def evaluate_model(clf, hyperparams, X_train, X_val, y_val, X_test, y_test):
+def evaluate_model_family(clf, hyperparams, X_train, X_val, y_val, X_test, y_test):
     ''' Function that randomly searches the hyperparameter space
     and finds the optimal hyperparameter set for a given model.
 
@@ -88,7 +86,7 @@ def evaluate_model(clf, hyperparams, X_train, X_val, y_val, X_test, y_test):
         best_hp_set (dict): The set of hyperparameter values that achieved the best_score
     '''
     # Timeout for searching a single model
-    timeout = float(os.getenv('timeout'))
+    timeout = float(os.getenv('model_timeout'))
 
     # List of hyperparam combinations
     hyperparam_sets = list(product_dict(**hyperparams))
@@ -108,31 +106,14 @@ def evaluate_model(clf, hyperparams, X_train, X_val, y_val, X_test, y_test):
     for hp_set in hyperparam_sets:
         #print(hp_set)
         search_count += 1 # inc search counter
-        # define model
-        clf.set_params(**hp_set)
-
-        # fit model and time it
-        #print('\t\tFitting', search_count)
-        start_time = time.time()
-        clf.fit(X_train)
-        end_time = time.time()
-        elapsed_time = round_num(end_time - start_time)
-
-        # get prediction on validation set
-        #print('\t\tPredicting', search_count)
-        y_true, y_pred = y_val, clf.predict(X_val)
-
-        # calculate scores
-        #print('\t\tScoring', search_count)
-        y_val_scores = clf.decision_function(X_val)  # outlier scores
-        f1 = round_num(f1_score(y_true, y_pred, average='weighted')) # f1
-        auc = round_num(roc_auc_score(y_val, y_val_scores)) # auc
-        #print('\t\tSearch:',search_count, 'f1:', f1, 'auc:', auc)
+        
+        # Apply model instance and get scores
+        scores, elapsed_time = evaluate_model_instance(clf, hp_set, X_train, X_val, y_val)
 
         # Determine best score and hyperparams
-        if(f1 > best_scores['f1']):
-            best_scores['f1'] = f1
-            best_scores['auc'] = auc
+        if(scores['f1'] > best_scores['f1']):
+            best_scores['f1'] = scores['f1']
+            best_scores['auc'] = scores['auc']
             best_hp_set = hp_set
 
         total_time += elapsed_time # update time
