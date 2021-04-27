@@ -84,10 +84,20 @@ def find_best_model(dataset):
         total_time += fit_time
         total_time = round_num(total_time)
 
+    # Evaluate best model on test set
+    test_scores, test_fit_time = evaluate_model_instance(
+        models[best_model_name]['instance'],
+        best_model_params,
+        X_train,
+        X_test,
+        y_test,
+    )
+
     print("Elapsed time:", total_time)
     print('Best model:', best_model_name)
-    print('Best model scores:', best_model_scores)
     print('Best model params:', best_model_params)
+    print('Best model scores (validation):', best_model_scores)
+    print('Best model scores (test):', test_scores)
     print('\n')
 
 def main():
