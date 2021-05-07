@@ -75,18 +75,33 @@ def evaluate_model_instance(clf, hp, X_train, X_val, y_val):
     '''
     # set model params
     clf.set_params(**hp)
+    
+    f1 = 0 # init f1
+    auc = 0 # init auc
 
     # fit model and time it
     start_time = time.time()
-    clf.fit(X_train)
+    try:
+        clf.fit(X_train)
+    except:
+        print("Error during fit()")
+    
+    # calculate scores
+    try:
+        y_pred = clf.predict(X_val) # predict()
+        f1 = round_num(f1_score(y_val, y_pred)) # f1
+    except:
+        print("Error during predict()")
+    
+    try:
+        y_val_scores = clf.decision_function(X_val) # decision_function()
+        auc = round_num(roc_auc_score(y_val, y_val_scores)) # auc
+    except:
+        print("Error during decision_function()")
+    
+    # End timing
     end_time = time.time()
     elapsed_time = round_num(end_time - start_time)
-
-    # calculate scores
-    y_pred = clf.predict(X_val) # predict()
-    f1 = round_num(f1_score(y_val, y_pred)) # f1
-    y_val_scores = clf.decision_function(X_val) # decision_function()
-    auc = round_num(roc_auc_score(y_val, y_val_scores)) # auc
 
     scores={"f1": f1, "auc": auc} # dict
 
