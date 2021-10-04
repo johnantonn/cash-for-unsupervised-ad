@@ -1,4 +1,4 @@
-# Anomaly detection model and hyperparameter selection under constrained and biased validation sets
+# Anomaly detection model selection and hyperparameter optimization using AutoML algorithms
 This is the repository for my thesis in the Master of Artificial Intelligence programme at KU Leuven.
 
 ## Description
