@@ -1,13 +1,25 @@
-# Gamblers galore; a multi-armed bandit strategy for anomaly detection model selection
+# Anomaly detection model selection and hyperparameter optimization using AutoML algorithms
 This is the repository for my thesis in the Master of Artificial Intelligence programme at KU Leuven.
 
-<img width="300" src="https://miro.medium.com/max/875/0*jFV1aQ88ZsXajRgO.png">
-
 ## Description
-Given a dataset that contains anomalies, a set of anomaly detection models and a computational budget, the task is to converge as quickly as possible to the best possible model for the dataset.
+The aim of the thesis is to experiment on constrained and biased anomaly detection datasets and compare the performance for several state-of-the-art hyper-parameter optimization frameworks such as:
+* Grid Search
+* Random Search
+* Genetic Algorithms
+* Bayesian Optimization
+* Bandit-based algorithms
 
-### Dataset
-The dataset used by this implementation is taken from [here](https://www.dbs.ifi.lmu.de/research/outlier-evaluation/DAMI/).
+for model and hyper-parameter selection. Several packages exist that provide subset or all of the aforementioned functionality:
+* Auto-sklearn
+* Hyperopt-Sklearn
+* Auto-WEKA
+* TPOT
+* Automatic Statistician
+
+An additional goal of this thesis is the experimentation with (some of) these packages on the stated problem and the proper visualization/report of the results and conclusions.
+
+### Datasets
+A well-known set of datasets for initial experimentation can be found [here](https://www.dbs.ifi.lmu.de/research/outlier-evaluation/DAMI/).
 
 ### Anomaly detection algorithms
 The implementation makes use of the [PyOD](https://pyod.readthedocs.io/en/latest/index.html) package.
