@@ -1,4 +1,4 @@
-# Anomaly detection model selection and hyperparameter optimization using AutoML
+# CASH optimization for anomaly detection using AutoML
 This is the repository for my thesis in the Master of Artificial Intelligence programme at KU Leuven.
 
 ## Description
