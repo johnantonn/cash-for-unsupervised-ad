@@ -1,0 +1,3 @@
+[submodule "auto-sklearn"]
+	path = auto-sklearn
+	url = https://github.com/johnantonn/auto-sklearn
