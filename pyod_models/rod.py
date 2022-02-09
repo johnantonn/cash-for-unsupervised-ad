@@ -2,7 +2,7 @@ from ConfigSpace.configuration_space import ConfigurationSpace
 from ConfigSpace.hyperparameters import UniformFloatHyperparameter
 
 from autosklearn.pipeline.components.base import AutoSklearnClassificationAlgorithm
-from autosklearn.pipeline.constants import DENSE, UNSIGNED_DATA, PREDICTIONS, SPARSE
+from autosklearn.pipeline.constants import DENSE, SPARSE, UNSIGNED_DATA, PREDICTIONS
 
 class RODClassifier(AutoSklearnClassificationAlgorithm):
 
@@ -14,7 +14,9 @@ class RODClassifier(AutoSklearnClassificationAlgorithm):
     def fit(self, X, Y):
         from pyod.models.rod import ROD
 
-        self.estimator = ROD(contamination=self.contamination)
+        self.estimator = ROD(
+            contamination = self.contamination
+        )
         self.estimator.fit(X, Y)
         return self
 
@@ -31,8 +33,8 @@ class RODClassifier(AutoSklearnClassificationAlgorithm):
     @staticmethod
     def get_properties(dataset_properties=None):
         return {
-            'shortname': 'KNN',
-            'name': 'K Nearest Neighbors',
+            'shortname': 'ROD',
+            'name': 'Rotation-based Outlier Detection',
             'handles_regression': False,
             'handles_classification': True,
             'handles_multiclass': False,
@@ -48,7 +50,11 @@ class RODClassifier(AutoSklearnClassificationAlgorithm):
         cs = ConfigurationSpace()
 
         contamination = UniformFloatHyperparameter(
-            name="contamination", lower=0.0, upper=0.5, default_value=0.1)
+            name = "contamination",
+            lower = 0.0,
+            upper = 0.5,
+            default_value = 0.1
+        )
         cs.add_hyperparameters([contamination])
 
         return cs

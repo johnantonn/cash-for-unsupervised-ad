@@ -1,21 +1,27 @@
 from ConfigSpace.configuration_space import ConfigurationSpace
-from ConfigSpace.hyperparameters import CategoricalHyperparameter, UniformIntegerHyperparameter
+from ConfigSpace.hyperparameters import UniformIntegerHyperparameter, \
+    UniformFloatHyperparameter, CategoricalHyperparameter
 
 from autosklearn.pipeline.components.base import AutoSklearnClassificationAlgorithm
-from autosklearn.pipeline.constants import DENSE, UNSIGNED_DATA, PREDICTIONS, SPARSE
+from autosklearn.pipeline.constants import DENSE, SPARSE, UNSIGNED_DATA, PREDICTIONS
 
 class LMDDClassifier(AutoSklearnClassificationAlgorithm):
 
-    def __init__(self, dis_measure, n_iter, random_state=None):
+    def __init__(self, contamination, n_iter, dis_measure, random_state=None):
+        self.contamination = contamination
+        self.n_iter = n_iter
         self.dis_measure = dis_measure
-        self.n_iter = n_iter 
         self.random_state = random_state
         self.estimator = None
 
     def fit(self, X, Y):
         from pyod.models.lmdd import LMDD
 
-        self.estimator = LMDD(dis_measure = self.dis_measure, n_iter = self.n_iter )
+        self.estimator = LMDD(
+            contamination = self.contamination,
+            n_iter = self.n_iter,
+            dis_measure = self.dis_measure, 
+        )
         self.estimator.fit(X, Y)
         return self
 
@@ -48,18 +54,24 @@ class LMDDClassifier(AutoSklearnClassificationAlgorithm):
     def get_hyperparameter_search_space(dataset_properties=None):
         cs = ConfigurationSpace()
 
-        dis_measure = CategoricalHyperparameter(
-            name="dis_measure",
-            choices=["aad", "var", "iqr"],
-            default_value="aad"
+        contamination = UniformFloatHyperparameter(
+            name = "contamination",
+            lower = 0.0,
+            upper = 0.5,
+            default_value = 0.1
         )
         n_iter = UniformIntegerHyperparameter(
-            name="n_iter",
-            lower=10,
-            upper=200,
-            default_value=50
+            name = "n_iter",
+            lower = 1,
+            upper = 200, # ad-hoc
+            default_value = 50
         )
-                                     
-        cs.add_hyperparameters([dis_measure, n_iter])
+        dis_measure = CategoricalHyperparameter(
+            name = "dis_measure",
+            choices = ["aad", "var", "iqr"],
+            default_value = "aad"
+        )
+          
+        cs.add_hyperparameters([contamination, n_iter, dis_measure])
 
         return cs

@@ -10,5 +10,5 @@ data/*
 # __pycache__
 **/__pycache__/
 
-# env
-**.env**
+# pynb checkpoints
+**/.ipynb_checkpoints/

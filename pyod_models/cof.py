@@ -1,12 +1,14 @@
 from ConfigSpace.configuration_space import ConfigurationSpace
-from ConfigSpace.hyperparameters import UniformIntegerHyperparameter, CategoricalHyperparameter
+from ConfigSpace.hyperparameters import UniformIntegerHyperparameter, \
+    UniformFloatHyperparameter, CategoricalHyperparameter
 
 from autosklearn.pipeline.components.base import AutoSklearnClassificationAlgorithm
-from autosklearn.pipeline.constants import DENSE, UNSIGNED_DATA, PREDICTIONS, SPARSE
+from autosklearn.pipeline.constants import DENSE, SPARSE, UNSIGNED_DATA, PREDICTIONS
 
 class COFClassifier(AutoSklearnClassificationAlgorithm):
 
-    def __init__(self, n_neighbors, method, random_state=None):
+    def __init__(self, contamination, n_neighbors, method, random_state=None):
+        self.contamination = contamination
         self.n_neighbors = n_neighbors
         self.method = method
         self.random_state = random_state
@@ -15,7 +17,11 @@ class COFClassifier(AutoSklearnClassificationAlgorithm):
     def fit(self, X, Y):
         from pyod.models.cof import COF
 
-        self.estimator = COF(n_neighbors=self.n_neighbors, method=self.method)
+        self.estimator = COF(
+            contamination = self.contamination,
+            n_neighbors = self.n_neighbors,
+            method = self.method
+        )
         self.estimator.fit(X, Y)
         return self
 
@@ -48,13 +54,23 @@ class COFClassifier(AutoSklearnClassificationAlgorithm):
     def get_hyperparameter_search_space(dataset_properties=None):
         cs = ConfigurationSpace()
 
-        n_neighbors = UniformIntegerHyperparameter(
-            name="n_neighbors", lower=1, upper=200, default_value=1)
-        method = CategoricalHyperparameter(
-            name="method", 
-            choices=["fast", "memory"],
-            default_value="fast"
+        contamination = UniformFloatHyperparameter(
+            name = "contamination",
+            lower = 0.0,
+            upper = 0.5,
+            default_value = 0.1
         )
-        cs.add_hyperparameters([n_neighbors])
+        n_neighbors = UniformIntegerHyperparameter(
+            name = "n_neighbors",
+            lower = 1,
+            upper = 200, # ad-hoc
+            default_value = 20
+        )
+        method = CategoricalHyperparameter(
+            name = "method", 
+            choices = ["fast", "memory"],
+            default_value = "fast"
+        )
+        cs.add_hyperparameters([contamination, n_neighbors, method])
 
         return cs

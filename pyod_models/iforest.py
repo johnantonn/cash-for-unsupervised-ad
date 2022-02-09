@@ -1,20 +1,32 @@
 from ConfigSpace.configuration_space import ConfigurationSpace
-from ConfigSpace.hyperparameters import UniformIntegerHyperparameter
+from ConfigSpace.hyperparameters import UniformIntegerHyperparameter, \
+    UniformFloatHyperparameter, CategoricalHyperparameter
 
 from autosklearn.pipeline.components.base import AutoSklearnClassificationAlgorithm
-from autosklearn.pipeline.constants import DENSE, UNSIGNED_DATA, PREDICTIONS, SPARSE
+from autosklearn.pipeline.constants import DENSE, SPARSE, UNSIGNED_DATA, PREDICTIONS
 
 class IForestClassifier(AutoSklearnClassificationAlgorithm):
 
-    def __init__(self, n_estimators, random_state=None):
+    def __init__(self, n_estimators, max_samples, max_features, contamination, 
+                 bootstrap, random_state=None):
         self.n_estimators = n_estimators
+        self.max_samples = max_samples
+        self.max_features = max_features
+        self.contamination = contamination
+        self.bootstrap = bootstrap
         self.random_state = random_state
         self.estimator = None
 
     def fit(self, X, Y):
         from pyod.models.iforest import IForest
 
-        self.estimator = IForest(n_estimators=self.n_estimators)
+        self.estimator = IForest(
+            n_estimators = self.n_estimators,
+            max_samples = self.max_samples,
+            max_features = self.max_features,
+            contamination = self.contamination,
+            bootstrap = self.bootstrap
+        )
         self.estimator.fit(X, Y)
         return self
 
@@ -48,7 +60,34 @@ class IForestClassifier(AutoSklearnClassificationAlgorithm):
         cs = ConfigurationSpace()
 
         n_estimators = UniformIntegerHyperparameter(
-            name="n_estimators", lower=10, upper=200, default_value=100)
-        cs.add_hyperparameters([n_estimators])
+            name = "n_estimators",
+            lower = 2, # ad-hoc
+            upper = 500, # ad-hoc
+            default_value = 100
+        )
+        max_samples = UniformFloatHyperparameter(
+            name = "max_samples",
+            lower = 0.1, # ad-hoc
+            upper = 1.0,
+            default_value = 1.0
+        )
+        max_features = UniformFloatHyperparameter(
+            name = "max_features",
+            lower = 0.1, # ad-hoc
+            upper = 1.0,
+            default_value = 1.0
+        )
+        contamination = UniformFloatHyperparameter(
+            name = "contamination",
+            lower = 0.0,
+            upper = 0.5,
+            default_value = 0.1
+        )
+        bootstrap = CategoricalHyperparameter(
+            name = "bootstrap", 
+            choices = [True, False],
+            default_value = False
+        )
+        cs.add_hyperparameters([n_estimators, max_samples, max_features, contamination, bootstrap])
 
         return cs

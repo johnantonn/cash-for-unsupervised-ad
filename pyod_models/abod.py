@@ -1,21 +1,26 @@
 from ConfigSpace.configuration_space import ConfigurationSpace
-from ConfigSpace.hyperparameters import UniformIntegerHyperparameter, CategoricalHyperparameter
-from ConfigSpace.conditions import EqualsCondition
-
+from ConfigSpace.hyperparameters import UniformIntegerHyperparameter, \
+    UniformFloatHyperparameter, CategoricalHyperparameter
 from autosklearn.pipeline.components.base import AutoSklearnClassificationAlgorithm
-from autosklearn.pipeline.constants import DENSE, UNSIGNED_DATA, PREDICTIONS, SPARSE
+from autosklearn.pipeline.constants import DENSE, SPARSE, UNSIGNED_DATA, PREDICTIONS
 
 class ABODClassifier(AutoSklearnClassificationAlgorithm):
 
-    def __init__(self, n_neighbors, random_state=None):
+    def __init__(self, contamination, n_neighbors, method, random_state=None):
+        self.contamination = contamination
         self.n_neighbors = n_neighbors
+        self.method = method
         self.random_state = random_state
         self.estimator = None
 
     def fit(self, X, Y):
         from pyod.models.abod import ABOD
 
-        self.estimator = ABOD(n_neighbors = self.n_neighbors)
+        self.estimator = ABOD(
+            contamination = self.contamination,
+            n_neighbors = self.n_neighbors,
+            method = self.method
+        )
         self.estimator.fit(X, Y)
         return self
 
@@ -32,8 +37,8 @@ class ABODClassifier(AutoSklearnClassificationAlgorithm):
     @staticmethod
     def get_properties(dataset_properties=None):
         return {
-            'shortname': 'COPOD',
-            'name': 'Copula Based Outlier Detector',
+            'shortname': 'ABOD',
+            'name': 'Angle-Based Outlier Detection',
             'handles_regression': False,
             'handles_classification': True,
             'handles_multiclass': False,
@@ -48,8 +53,23 @@ class ABODClassifier(AutoSklearnClassificationAlgorithm):
     def get_hyperparameter_search_space(dataset_properties=None):
         cs = ConfigurationSpace()
 
+        contamination = UniformFloatHyperparameter(
+            name = "contamination",
+            lower = 0.0,
+            upper = 0.5,
+            default_value = 0.1
+        )
         n_neighbors = UniformIntegerHyperparameter(
-            name="n_neighbors", lower=1, upper=200, default_value=10)
-        cs.add_hyperparameters([n_neighbors])
+            name = "n_neighbors",
+            lower = 1,
+            upper = 200, # ad-hoc
+            default_value = 10
+        )
+        method = CategoricalHyperparameter(
+            name = "method",
+            choices = ["fast", "default"],
+            default_value = "fast"
+        )
+        cs.add_hyperparameters([contamination, n_neighbors, method])
 
         return cs

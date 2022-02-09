@@ -1,22 +1,32 @@
 from ConfigSpace.configuration_space import ConfigurationSpace
-from ConfigSpace.hyperparameters import UniformIntegerHyperparameter, UniformFloatHyperparameter
+from ConfigSpace.hyperparameters import UniformIntegerHyperparameter, \
+    UniformFloatHyperparameter, CategoricalHyperparameter
 
 from autosklearn.pipeline.components.base import AutoSklearnClassificationAlgorithm
-from autosklearn.pipeline.constants import DENSE, UNSIGNED_DATA, PREDICTIONS, SPARSE
+from autosklearn.pipeline.constants import DENSE, SPARSE, UNSIGNED_DATA, PREDICTIONS
 
 class CBLOFClassifier(AutoSklearnClassificationAlgorithm):
 
-    def __init__(self, n_clusters, alpha, beta, random_state=None):
-        self.n_neighbors = n_clusters
+    def __init__(self, n_clusters, contamination, alpha, beta, 
+                 use_weights, random_state=None):
+        self.n_clusters = n_clusters
+        self.contamination = contamination
         self.alpha = alpha
         self.beta = beta
+        self.use_weights = use_weights
         self.random_state = random_state
         self.estimator = None
 
     def fit(self, X, Y):
         from pyod.models.cblof import CBLOF
 
-        self.estimator = CBLOF(n_clusters=self.n_clusters, alpha=self.alpha, beta=self.beta)
+        self.estimator = CBLOF(
+            n_clusters = self.n_clusters,
+            contamination = self.contamination,
+            alpha = self.alpha,
+            beta = self.beta,
+            use_weights = self.use_weights
+        )
         self.estimator.fit(X, Y)
         return self
 
@@ -50,11 +60,34 @@ class CBLOFClassifier(AutoSklearnClassificationAlgorithm):
         cs = ConfigurationSpace()
 
         n_clusters  = UniformIntegerHyperparameter(
-            name="n_clusters", lower=2, upper=20, default_value=8)
-        alpha  = UniformFloatHyperparameter(
-            name="alpha", lower=0.5, upper=1, default_value=0.5)
+            name = "n_clusters",
+            lower = 2,
+            upper = 20, # ad-hoc
+            default_value = 8
+        )
+        contamination = UniformFloatHyperparameter(
+            name = "contamination",
+            lower = 0.0,
+            upper = 0.5,
+            default_value = 0.1
+        )
+        alpha = UniformFloatHyperparameter(
+            name = "alpha",
+            lower = 0.5,
+            upper = 1.0,
+            default_value = 0.9
+        )
         beta = UniformIntegerHyperparameter(
-            name="beta", lower=1, upper=20, default_value=5)
-        cs.add_hyperparameters([n_clusters, alpha, beta])
+            name = "beta",
+            lower = 1,
+            upper = 100, # ad-hoc
+            default_value = 5
+        )
+        use_weights = CategoricalHyperparameter(
+            name = "use_weights",
+            choices = [True, False],
+            default_value = False
+        )
+        cs.add_hyperparameters([n_clusters, contamination, alpha, beta, use_weights])
 
         return cs
