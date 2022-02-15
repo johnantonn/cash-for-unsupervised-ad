@@ -1,26 +1,27 @@
 from ConfigSpace.configuration_space import ConfigurationSpace
 from ConfigSpace.hyperparameters import UniformIntegerHyperparameter, \
-    UniformFloatHyperparameter, CategoricalHyperparameter
+    UniformFloatHyperparameter
 
 from autosklearn.pipeline.components.base import AutoSklearnClassificationAlgorithm
 from autosklearn.pipeline.constants import DENSE, SPARSE, UNSIGNED_DATA, PREDICTIONS
 
-class COFClassifier(AutoSklearnClassificationAlgorithm):
+class SODClassifier(AutoSklearnClassificationAlgorithm):
 
-    def __init__(self, contamination, n_neighbors, method, random_state=None):
-        self.contamination = contamination
+    def __init__(self, n_neighbors, alpha, contamination, 
+                 random_state=None):
         self.n_neighbors = n_neighbors
-        self.method = method
+        self.alpha = alpha
+        self.contamination = contamination
         self.random_state = random_state
         self.estimator = None
 
     def fit(self, X, Y):
-        from pyod.models.cof import COF
+        from pyod.models.sod import SOD
 
-        self.estimator = COF(
-            contamination = self.contamination,
+        self.estimator = SOD(
             n_neighbors = self.n_neighbors,
-            method = self.method
+            alpha = self.alpha,
+            contamination = self.contamination
         )
         self.estimator.fit(X, Y)
         return self
@@ -38,8 +39,8 @@ class COFClassifier(AutoSklearnClassificationAlgorithm):
     @staticmethod
     def get_properties(dataset_properties=None):
         return {
-            'shortname': 'COF',
-            'name': 'Connectivity-Based Outlier Factor',
+            'shortname': 'SOD',
+            'name': 'Subspace Outlier Detection',
             'handles_regression': False,
             'handles_classification': True,
             'handles_multiclass': False,
@@ -54,23 +55,24 @@ class COFClassifier(AutoSklearnClassificationAlgorithm):
     def get_hyperparameter_search_space(dataset_properties=None):
         cs = ConfigurationSpace()
 
+        n_neighbors = UniformIntegerHyperparameter(
+            name = "n_neighbors",
+            lower = 1,
+            upper = 100, # ad-hoc
+            default_value = 20
+        )
+        alpha = UniformFloatHyperparameter(
+            name = "alpha",
+            lower = 0.0,
+            upper = 1.0,
+            default_value = 0.8
+        )
         contamination = UniformFloatHyperparameter(
-            name = "contamination",
+            name = "contamination", 
             lower = 0.0,
             upper = 0.5,
             default_value = 0.1
         )
-        n_neighbors = UniformIntegerHyperparameter(
-            name = "n_neighbors",
-            lower = 1,
-            upper = 200, # ad-hoc
-            default_value = 20
-        )
-        method = CategoricalHyperparameter(
-            name = "method", 
-            choices = ["fast", "memory"],
-            default_value = "fast"
-        )
-        cs.add_hyperparameters([contamination, n_neighbors, method])
+        cs.add_hyperparameters([n_neighbors, alpha, contamination])
 
         return cs

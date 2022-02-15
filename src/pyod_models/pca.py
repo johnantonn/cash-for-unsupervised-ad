@@ -5,24 +5,27 @@ from ConfigSpace.hyperparameters import UniformIntegerHyperparameter, \
 from autosklearn.pipeline.components.base import AutoSklearnClassificationAlgorithm
 from autosklearn.pipeline.constants import DENSE, SPARSE, UNSIGNED_DATA, PREDICTIONS
 
-class KNNClassifier(AutoSklearnClassificationAlgorithm):
+class PCAClassifier(AutoSklearnClassificationAlgorithm):
 
-    def __init__(self, n_neighbors, method, p, contamination, random_state=None):
-        self.n_neighbors = n_neighbors
-        self.method = method
-        self.p = p
+    def __init__(self, n_components, contamination, whiten, svd_solver, 
+                 weighted, random_state=None):
+        self.n_components = n_components
         self.contamination = contamination
+        self.whiten = whiten
+        self.svd_solver = svd_solver
+        self.weighted = weighted
         self.random_state = random_state
         self.estimator = None
 
     def fit(self, X, Y):
-        from pyod.models.knn import KNN
+        from pyod.models.pca import PCA
 
-        self.estimator = KNN(
-            n_neighbors = self.n_neighbors,
-            method = self.method,
-            p = self.p,
-            contamination = self.contamination
+        self.estimator = PCA(
+            n_components = self.n_components,
+            contamination = self.contamination,
+            whiten = self.whiten,
+            svd_solver = self.svd_solver,
+            weighted = self.weighted
         )
         self.estimator.fit(X, Y)
         return self
@@ -40,8 +43,8 @@ class KNNClassifier(AutoSklearnClassificationAlgorithm):
     @staticmethod
     def get_properties(dataset_properties=None):
         return {
-            'shortname': 'KNN',
-            'name': 'K Nearest Neighbors',
+            'shortname': 'PCA',
+            'name': 'Principal Component Analysis',
             'handles_regression': False,
             'handles_classification': True,
             'handles_multiclass': False,
@@ -55,31 +58,34 @@ class KNNClassifier(AutoSklearnClassificationAlgorithm):
     @staticmethod
     def get_hyperparameter_search_space(dataset_properties=None):
         cs = ConfigurationSpace()
-
-        n_neighbors = UniformIntegerHyperparameter(
-            name = "n_neighbors",
+        
+        n_components = UniformIntegerHyperparameter(
+            name = "n_components",
             lower = 1,
-            upper = 200, # ad-hoc
-            default_value = 5
-        )
-        method = CategoricalHyperparameter(
-            name = "method",
-            choices = ['largest', 'mean', 'median'],
-            default_value = 'largest'
-        )
-        # order of minkowski distance metric (used by default)
-        p = UniformIntegerHyperparameter(
-            name = "p",
-            lower = 1, # manhattan
-            upper = 2, # euclidean
-            default_value = 2
+            upper = 20, # ad-hoc
+            default_value = 5 # ad-hoc
         )
         contamination = UniformFloatHyperparameter(
-            name = "contamination",
+            name = "contamination", 
             lower = 0.0,
             upper = 0.5,
             default_value = 0.1
         )
-        cs.add_hyperparameters([n_neighbors, method, contamination])
-
+        whiten = CategoricalHyperparameter(
+            name = "whiten", 
+            choices = [True, False],
+            default_value = False
+        )
+        svd_solver = CategoricalHyperparameter(
+            name = "svd_solver", 
+            choices = ['auto', 'full', 'arpack', 'randomized'],
+            default_value = 'auto'
+        )
+        weighted = CategoricalHyperparameter(
+            name = "weighted", 
+            choices = [True, False],
+            default_value = True
+        )
+        cs.add_hyperparameters([n_components, contamination, whiten, svd_solver, weighted])
+        
         return cs

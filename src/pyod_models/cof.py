@@ -5,27 +5,22 @@ from ConfigSpace.hyperparameters import UniformIntegerHyperparameter, \
 from autosklearn.pipeline.components.base import AutoSklearnClassificationAlgorithm
 from autosklearn.pipeline.constants import DENSE, SPARSE, UNSIGNED_DATA, PREDICTIONS
 
-class PCAClassifier(AutoSklearnClassificationAlgorithm):
+class COFClassifier(AutoSklearnClassificationAlgorithm):
 
-    def __init__(self, n_components, contamination, whiten, svd_solver, 
-                 weighted, random_state=None):
-        self.n_components = n_components
+    def __init__(self, contamination, n_neighbors, method, random_state=None):
         self.contamination = contamination
-        self.whiten = whiten
-        self.svd_solver = svd_solver
-        self.weighted = weighted
+        self.n_neighbors = n_neighbors
+        self.method = method
         self.random_state = random_state
         self.estimator = None
 
     def fit(self, X, Y):
-        from pyod.models.pca import PCA
+        from pyod.models.cof import COF
 
-        self.estimator = PCA(
-            n_components = self.n_components,
+        self.estimator = COF(
             contamination = self.contamination,
-            whiten = self.whiten,
-            svd_solver = self.svd_solver,
-            weighted = self.weighted
+            n_neighbors = self.n_neighbors,
+            method = self.method
         )
         self.estimator.fit(X, Y)
         return self
@@ -43,8 +38,8 @@ class PCAClassifier(AutoSklearnClassificationAlgorithm):
     @staticmethod
     def get_properties(dataset_properties=None):
         return {
-            'shortname': 'PCA',
-            'name': 'Principal Component Analysis',
+            'shortname': 'COF',
+            'name': 'Connectivity-Based Outlier Factor',
             'handles_regression': False,
             'handles_classification': True,
             'handles_multiclass': False,
@@ -58,34 +53,24 @@ class PCAClassifier(AutoSklearnClassificationAlgorithm):
     @staticmethod
     def get_hyperparameter_search_space(dataset_properties=None):
         cs = ConfigurationSpace()
-        
-        n_components = UniformIntegerHyperparameter(
-            name = "n_components",
-            lower = 1,
-            upper = 100, # ad-hoc
-            default_value = 5 # ad-hoc
-        )
+
         contamination = UniformFloatHyperparameter(
-            name = "contamination", 
+            name = "contamination",
             lower = 0.0,
             upper = 0.5,
             default_value = 0.1
         )
-        whiten = CategoricalHyperparameter(
-            name = "whiten", 
-            choices = [True, False],
-            default_value = False
+        n_neighbors = UniformIntegerHyperparameter(
+            name = "n_neighbors",
+            lower = 1,
+            upper = 100, # ad-hoc
+            default_value = 20
         )
-        svd_solver = CategoricalHyperparameter(
-            name = "svd_solver", 
-            choices = ['auto', 'full', 'arpack', 'randomized'],
-            default_value = 'auto'
+        method = CategoricalHyperparameter(
+            name = "method", 
+            choices = ["fast", "memory"],
+            default_value = "fast"
         )
-        weighted = CategoricalHyperparameter(
-            name = "weighted", 
-            choices = [True, False],
-            default_value = True
-        )
-        cs.add_hyperparameters([n_components, contamination, whiten, svd_solver, weighted])
-        
+        cs.add_hyperparameters([contamination, n_neighbors, method])
+
         return cs
