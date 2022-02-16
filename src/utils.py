@@ -30,7 +30,16 @@ def import_dataset(filepath):
     return df
 
 def add_pyod_models_to_pipeline():
-    # Import Auto-Sklearn implemented PyOD classifiers
+    """ Function that imports the external PyOD models and adds them to Aut-Sklearn.
+
+    Args:
+        None
+
+    Returns:
+        None
+    """
+
+    # Import Auto-Sklearn-compatible PyOD algorithms
     from pyod_models.abod import ABODClassifier # probabilistic
     from pyod_models.cblof import CBLOFClassifier # proximity-based
     from pyod_models.cof import COFClassifier # proximity-based
@@ -50,7 +59,7 @@ def add_pyod_models_to_pipeline():
     from pyod_models.sod import SODClassifier # proximity-based
     from pyod_models.sos import SOSClassifier # probabilistic
     
-    # Add algorithms to the pipeline components of Auto-Sklearn
+    # Add to Auto-Sklearn pipeline
     add_classifier(ABODClassifier)
     add_classifier(CBLOFClassifier)
     add_classifier(COFClassifier)
@@ -70,11 +79,24 @@ def add_pyod_models_to_pipeline():
     add_classifier(SODClassifier)
     add_classifier(SOSClassifier)
 
-def select_split_indices(y_train):
-    # Pre-defined split indices for train and validation
+def select_split_indices(y):
+    """ Function that takes the target attribute values, y 
+    and returns indices for training and validation sets.
+
+    Args:
+        y (list or np.array): The target attribute labels y
+
+    Returns:
+        (list): A list indicating whether the corresponding 
+        index will be part of the training set (0) or the 
+        validation set (1).
+    """
+
+    # init
     selected_indices = []
-    sacrificed_outliers = 0 # count of outliers sampled for the training set
-    for v in y_train:
+    # number of outliers sampled for the training set
+    sacrificed_outliers = 0
+    for v in y:
         if v==1: # outlier
             if np.random.rand()>0.05:
                 selected_indices.append(1) # validation
@@ -87,18 +109,22 @@ def select_split_indices(y_train):
             else:
                 selected_indices.append(0) # training
 
-    # prints
-    print('Length of selected indices:', len(selected_indices))
-    print('Number of total samples:', len(y_train))
-    print('Number of outliers:', sum(y_train))
-    print('Number of sacrificed outliers:', sacrificed_outliers)
-    print('Number of validation samples:', sum(selected_indices))
-    print('Number of training samples:', len(y_train) - sum(selected_indices))
-
     return selected_indices
 
 
 def get_metric_result(cv_results):
+    """ Function that takes as input the cv_results attribute
+    of an Auto-Sklearn classifier and returns a number of
+    results w.r.t. the defined metrics.
+
+    Args:
+        cv_results (dict): The cv_results attribute
+
+    Returns:
+        (list): list of applied models and their corresponding
+        performance metrics.
+    """
+
   # Get metric results function definition
     results = pd.DataFrame.from_dict(cv_results)
     cols = ['rank_test_scores', 'status', 'param_classifier:__choice__', 'mean_test_score', 'mean_fit_time']
@@ -106,24 +132,34 @@ def get_metric_result(cv_results):
     return results[cols].sort_values(['rank_test_scores'])
 
 def show_results(automl):
-    # auto-sklearn execution details
+    """ Takes as input an Auto-Sklearn estimator instance and
+    visualizes/prints performance metrics.
+
+    Args:
+        automl (dict): Auto-Sklearn estimator object
+
+    Returns:
+        None
+    """
+
+    print('Auto-Sklearn execution details')
     print(automl.sprint_statistics())
-    # Top ranked model
+    print('Top ranked model')
     print(automl.leaderboard(top_k=10))
-    # Top ranked model configuration
-    print()
+    print('Top ranked model configuration')
     print(automl.show_models())
 
-    # Call the function
+    # Call get_metric_result
     print(get_metric_result(automl.cv_results_).to_string(index=False))
 
-    # Plot training performance over time
+    # Plot of performance over time
     automl.performance_over_time_.plot(
-        x='Timestamp',
-        kind='line',
-        legend=True,
-        title='Auto-sklearn ROC AUC score over time',
-        grid=True,
+        x = 'Timestamp',
+        kind = 'line',
+        legend = True,
+        title = 'Auto-sklearn ROC AUC score over time',
+        grid = True,
     )
 
+    # Save figure
     plt.savefig('perf-time.png')

@@ -9,7 +9,7 @@ from utils import import_dataset, select_split_indices, add_pyod_models_to_pipel
 
 # Import DataFrame
 df = import_dataset('../data/Annthyroid_withoutdupl_norm_02_v01.arff')
-N = 2000
+N = 2000 # number of samples to use
 if(len(df) > N):
         df = df.sample(n=N)
 
@@ -20,7 +20,7 @@ X_train, X_test, y_train, y_test = train_test_split(
     X,
     y,
     test_size = 0.3,
-    random_state = 10
+    random_state = 82 # my current percentage grade
 )
 
 # Add PyOD models to Auto-Sklearn's pipeline
@@ -31,13 +31,14 @@ split_indices = select_split_indices(y_train)
 
 # Define custom resampling strategy
 resampling_strategy = PredefinedSplit(test_fold=split_indices)
+
 # Build and fit a automl classifier
 automl = AutoSklearnClassifier(
     include = {
       'classifier': [
           'ABODClassifier',
           'CBLOFClassifier',
-          #'COFClassifier',
+          #'COFClassifier', # currently not used
           'COPODClassifier',
           'ECODClassifier',
           'HBOSClassifier',
@@ -51,7 +52,7 @@ automl = AutoSklearnClassifier(
           'OCSVMClassifier',
           'PCAClassifier',
           'RODClassifier',
-          #'SODClassifier',
+          #'SODClassifier', # currently not used
           'SOSClassifier'
       ],
       'feature_preprocessor': ["no_preprocessing"],
