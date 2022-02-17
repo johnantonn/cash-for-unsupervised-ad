@@ -8,7 +8,7 @@ The aim of the thesis is to solve the CASH optimization problem for anomaly dete
 * Bayesian Optimization
 * Bandit-based algorithms
 
-Several packages exist for solving that problem, however the anomaly detection setting has not been explored thoroughly yet. The goal of this thesis is to extend **Auto-Sklearn** and incorporate anomaly detection algorithms from **PyOD** and evaluate its performance on a number of datasets with different characteristics.
+Several packages exist for solving CASH optimization, however the anomaly detection setting has not been explored thoroughly yet. The goal of this thesis is to extend **Auto-Sklearn** and incorporate anomaly detection algorithms from **PyOD** and evaluate its performance on a number of datasets with varying characteristics, e.g. number of available training points, number of available labels etc.
 
 ### Auto-Sklearn
 The current implementation can be found [here](https://github.com/automl/auto-sklearn).
