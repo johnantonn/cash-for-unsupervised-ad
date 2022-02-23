@@ -79,9 +79,93 @@ def add_pyod_models_to_pipeline():
     add_classifier(SODClassifier)
     add_classifier(SOSClassifier)
 
-def select_split_indices(y, print_flag=True):
+
+def create_search_space():
+    """
+        Create search space for random search
+    """
+    # Define PyOD algorithms
+    models = {} # default model instances
+    search_space = {} # the hyperparameter search space per algorithm
+    evaluated = {} # number of times a model of this family was evaluated
+    # ABOD
+    #from pyod_models.abod import ABODClassifier
+    #search_space['abod'] = ABODClassifier.get_hyperparameter_search_space()
+    #models['abod'] = ABODClassifier(**search_space['abod'].get_default_configuration())
+    #evaluated['abod'] = 0
+    # CBLOF
+    from pyod_models.cblof import CBLOFClassifier
+    search_space['cblof'] = CBLOFClassifier.get_hyperparameter_search_space()
+    models['cblof'] = CBLOFClassifier(**search_space['cblof'].get_default_configuration())
+    evaluated['cblof'] = 0
+    # COPOD
+    from pyod_models.copod import COPODClassifier
+    search_space['copod'] = COPODClassifier.get_hyperparameter_search_space()
+    models['copod'] = COPODClassifier(**search_space['copod'].get_default_configuration())
+    evaluated['copod'] = 0
+    # ECOD
+    from pyod_models.ecod import ECODClassifier
+    search_space['ecod'] = ECODClassifier.get_hyperparameter_search_space()
+    models['ecod'] = ECODClassifier(**search_space['ecod'].get_default_configuration())
+    evaluated['ecod'] = 0
+    # HBOS
+    from pyod_models.hbos import HBOSClassifier
+    search_space['hbos'] = HBOSClassifier.get_hyperparameter_search_space()
+    models['hbos'] = HBOSClassifier(**search_space['hbos'].get_default_configuration())
+    evaluated['hbos'] = 0
+    # IForest
+    from pyod_models.iforest import IForestClassifier
+    search_space['ifor'] = IForestClassifier.get_hyperparameter_search_space()
+    models['ifor'] = IForestClassifier(**search_space['ifor'].get_default_configuration())
+    evaluated['ifor'] = 0
+    # KNN
+    from pyod_models.knn import KNNClassifier
+    search_space['knn'] = KNNClassifier.get_hyperparameter_search_space()
+    models['knn'] = KNNClassifier(**search_space['knn'].get_default_configuration())
+    evaluated['knn'] = 0
+    # LMDD
+    #from pyod_models.lmdd import LMDDClassifier
+    #search_space['lmdd'] = LMDDClassifier.get_hyperparameter_search_space()
+    #models['lmdd'] = LMDDClassifier(**search_space['lmdd'].get_default_configuration())
+    #evaluated['lmdd'] = 0
+    # LOF
+    from pyod_models.lof import LOFClassifier
+    search_space['lof'] = LOFClassifier.get_hyperparameter_search_space()
+    models['lof'] = LOFClassifier(**search_space['lof'].get_default_configuration())
+    evaluated['lof'] = 0
+    # MCD
+    from pyod_models.mcd import MCDClassifier
+    search_space['mcd'] = MCDClassifier.get_hyperparameter_search_space()
+    models['mcd'] = MCDClassifier(**search_space['mcd'].get_default_configuration())
+    evaluated['mcd'] = 0
+    # OCSVM
+    from pyod_models.ocsvm import OCSVMClassifier
+    search_space['ocsvm'] = OCSVMClassifier.get_hyperparameter_search_space()
+    models['ocsvm'] = OCSVMClassifier(**search_space['ocsvm'].get_default_configuration())
+    evaluated['ocsvm'] = 0
+    # PCA
+    from pyod_models.pca import PCAClassifier
+    search_space['pca'] = PCAClassifier.get_hyperparameter_search_space()
+    models['pca'] = PCAClassifier(**search_space['pca'].get_default_configuration())
+    evaluated['pca'] = 0
+    # ROD
+    #from pyod_models.rod import RODClassifier
+    #search_space['rod'] = RODClassifier.get_hyperparameter_search_space()
+    #models['rod'] = RODClassifier(**search_space['rod'].get_default_configuration())
+    #evaluated['rod'] = 0
+    # SOS
+    from pyod_models.sos import SOSClassifier
+    search_space['sos'] = SOSClassifier.get_hyperparameter_search_space()
+    models['sos'] = SOSClassifier(**search_space['sos'].get_default_configuration())
+    evaluated['sos'] = 0
+    # return statement
+    return models, search_space, evaluated
+
+def custom_split(y, print_flag=True):
     """ Function that takes the target attribute values, y 
-    and returns indices for training and validation sets.
+    and returns indices for training and validation sets with
+    ratio of inliers/outliers in the validation set, that is
+    100% tunable.
 
     Args:
         y (list or np.array): The target attribute labels y
@@ -119,6 +203,37 @@ def select_split_indices(y, print_flag=True):
         print('Number of outliers in the validation split:', sum(y) - sacrificed_outliers)
 
     return selected_indices
+
+def balanced_split(y):
+    """ Function that takes the target attribute values, y 
+        and returns indices for training and validation, with
+        equal ratio of inliers/outliers in the validation set.
+
+    Args:
+        y (list or np.array): The target attribute labels y
+
+    Returns:
+        (list): A list indicating whether the corresponding 
+        index will be part of the training set (0) or the 
+        validation set (1).
+    """
+    pass
+
+def stratified_split(y):
+    """ Function that takes the target attribute values, y 
+        and returns indices for training and validation, by
+        preserving the original ratio of inliers/outliers in 
+        the validation set.
+
+    Args:
+        y (list or np.array): The target attribute labels y
+
+    Returns:
+        (list): A list indicating whether the corresponding 
+        index will be part of the training set (0) or the 
+        validation set (1).
+    """
+    pass
 
 def get_metric_result(cv_results):
     """ Function that takes as input the cv_results attribute
