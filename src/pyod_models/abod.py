@@ -34,6 +34,11 @@ class ABODClassifier(AutoSklearnClassificationAlgorithm):
             raise NotImplementedError()
         return self.estimator.predict_proba(X)
 
+    def decision_function(self, X):
+        if self.estimator is None:
+            raise NotImplementedError()
+        return self.estimator.decision_function(X)
+
     @staticmethod
     def get_properties(dataset_properties=None):
         return {
@@ -62,7 +67,7 @@ class ABODClassifier(AutoSklearnClassificationAlgorithm):
         n_neighbors = UniformIntegerHyperparameter(
             name = "n_neighbors",
             lower = 1,
-            upper = 200, # ad-hoc
+            upper = 100, # ad-hoc
             default_value = 10
         )
         method = CategoricalHyperparameter(
