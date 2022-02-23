@@ -79,7 +79,7 @@ def add_pyod_models_to_pipeline():
     add_classifier(SODClassifier)
     add_classifier(SOSClassifier)
 
-def select_split_indices(y):
+def select_split_indices(y, print_flag=True):
     """ Function that takes the target attribute values, y 
     and returns indices for training and validation sets.
 
@@ -94,23 +94,31 @@ def select_split_indices(y):
 
     # init
     selected_indices = []
-    # number of outliers sampled for the training set
-    sacrificed_outliers = 0
+    sacrificed_outliers = 0 # count of outliers sampled for the training set
+    prob_outlier_in_valid = 0.95 # probability of outlier included in the validation set
+    prob_normal_in_valid = 0.1 # probability of normal point included in the validation set
     for v in y:
         if v==1: # outlier
-            if np.random.rand()>0.05:
+            if np.random.rand() <= prob_outlier_in_valid:
                 selected_indices.append(1) # validation
             else:
-                selected_indices.append(0) # training
+                selected_indices.append(-1) # training
                 sacrificed_outliers += 1 # will not be used for evaluation
         else:
-            if np.random.rand()>0.9:
+            if np.random.rand() <= prob_normal_in_valid:
                 selected_indices.append(1) # validation
             else:
-                selected_indices.append(0) # training
+                selected_indices.append(-1) # training
+    # prints
+    if print_flag:
+        print('Number of total samples:', len(y))
+        print('Number of training samples:', selected_indices.count(-1))
+        print('Number of validation samples:', selected_indices.count(1))
+        print('Number of outliers:', sum(y))
+        print('Number of outliers in the training split:', sacrificed_outliers)
+        print('Number of outliers in the validation split:', sum(y) - sacrificed_outliers)
 
     return selected_indices
-
 
 def get_metric_result(cv_results):
     """ Function that takes as input the cv_results attribute
