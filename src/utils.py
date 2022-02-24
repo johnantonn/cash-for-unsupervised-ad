@@ -161,7 +161,7 @@ def create_search_space():
     # return statement
     return models, search_space, evaluated
 
-def custom_split(y, print_flag=True):
+def custom_split(y, p_out_valid = 0.95, p_norm_valid = 0.1, print_flag=True):
     """ Function that takes the target attribute values, y 
     and returns indices for training and validation sets with
     ratio of inliers/outliers in the validation set, that is
@@ -169,42 +169,47 @@ def custom_split(y, print_flag=True):
 
     Args:
         y (list or np.array): The target attribute labels y
-
+        p_out_valid (float): The probability of an outlier 
+            included in the validation set
+        p_norm_valid (float): The probability of a normal point 
+            included in the validation set
     Returns:
         (list): A list indicating whether the corresponding 
         index will be part of the training set (0) or the 
         validation set (1).
     """
-
     # init
     selected_indices = []
     sacrificed_outliers = 0 # count of outliers sampled for the training set
-    prob_outlier_in_valid = 0.95 # probability of outlier included in the validation set
-    prob_normal_in_valid = 0.1 # probability of normal point included in the validation set
     for v in y:
         if v==1: # outlier
-            if np.random.rand() <= prob_outlier_in_valid:
+            if np.random.rand() <= p_out_valid:
                 selected_indices.append(1) # validation
             else:
                 selected_indices.append(-1) # training
                 sacrificed_outliers += 1 # will not be used for evaluation
         else:
-            if np.random.rand() <= prob_normal_in_valid:
+            if np.random.rand() <= p_norm_valid:
                 selected_indices.append(1) # validation
             else:
                 selected_indices.append(-1) # training
     # prints
     if print_flag:
-        print('Number of total samples:', len(y))
+        print('Number of total samples to split:', len(y))
         print('Number of training samples:', selected_indices.count(-1))
+        print('Ratio of training samples:', selected_indices.count(-1)/len(y))
         print('Number of validation samples:', selected_indices.count(1))
-        print('Number of outliers:', sum(y))
+        print('Ratio of validation samples:', selected_indices.count(1)/len(y))
+        print('Number of outliers in total:', sum(y))
+        print('Ratio of outliers in total:', sum(y)/len(y))
         print('Number of outliers in the training split:', sacrificed_outliers)
+        print('Ratio of outliers in the training split:', sacrificed_outliers/selected_indices.count(-1))
         print('Number of outliers in the validation split:', sum(y) - sacrificed_outliers)
+        print('Ratio of outliers in the validation split:', (sum(y) - sacrificed_outliers)/(selected_indices.count(1)))
 
     return selected_indices
 
-def balanced_split(y):
+def balanced_split(y, print_flag=True):
     """ Function that takes the target attribute values, y 
         and returns indices for training and validation, with
         equal ratio of inliers/outliers in the validation set.
@@ -217,23 +222,37 @@ def balanced_split(y):
         index will be part of the training set (0) or the 
         validation set (1).
     """
-    pass
-
-def stratified_split(y):
-    """ Function that takes the target attribute values, y 
-        and returns indices for training and validation, by
-        preserving the original ratio of inliers/outliers in 
-        the validation set.
-
-    Args:
-        y (list or np.array): The target attribute labels y
-
-    Returns:
-        (list): A list indicating whether the corresponding 
-        index will be part of the training set (0) or the 
-        validation set (1).
-    """
-    pass
+    # init
+    selected_indices = [] # initially all in training
+    norm_train = 0
+    norm_test = 0
+    out_train = 0
+    out_test = 0
+    for v in y:
+        if v==1: # outlier
+            if out_train > 0: # one will have to go to train
+                selected_indices.append(1) # test
+                out_test += 1
+            else:
+                selected_indices.append(-1) # training
+                out_train += 1
+        else: # normal
+            if out_test > norm_test:
+                selected_indices.append(1) # test
+                norm_test += 1
+            else:
+                selected_indices.append(-1) # training
+                norm_train += 1
+    # prints
+    if print_flag:
+        print('Number of total samples to split:', len(y))
+        print('Number of outliers in training:', out_train)
+        print('Number of outliers in test:', out_test)
+        print('Number of normal points in training:', norm_train)
+        print('Number of normal points in test:', norm_test)
+    
+    return selected_indices
+        
 
 def get_metric_result(cv_results):
     """ Function that takes as input the cv_results attribute
