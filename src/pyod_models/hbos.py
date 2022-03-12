@@ -71,18 +71,21 @@ class HBOSClassifier(AutoSklearnClassificationAlgorithm):
             name = "alpha",
             lower = 0.0,
             upper = 1.0,
+            q = 0.01,
             default_value = 0.1
         )
         tol = UniformFloatHyperparameter(
             name = "tol",
-            lower = 0.0,
+            lower = 0.01,
             upper = 1.0,
+            q = 0.01,
             default_value = 0.5
         )
         contamination = UniformFloatHyperparameter(
             name = "contamination",
-            lower = 0.0,
+            lower = 0.01,
             upper = 0.5,
+            q = 0.01,
             default_value = 0.1
         )
         cs.add_hyperparameters([n_bins, alpha, tol, contamination])

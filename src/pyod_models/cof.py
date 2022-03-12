@@ -61,8 +61,9 @@ class COFClassifier(AutoSklearnClassificationAlgorithm):
 
         contamination = UniformFloatHyperparameter(
             name = "contamination",
-            lower = 0.0,
+            lower = 0.01,
             upper = 0.5,
+            q = 0.01,
             default_value = 0.1
         )
         n_neighbors = UniformIntegerHyperparameter(

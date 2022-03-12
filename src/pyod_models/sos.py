@@ -60,14 +60,16 @@ class SOSClassifier(AutoSklearnClassificationAlgorithm):
 
         contamination = UniformFloatHyperparameter(
             name = "contamination", 
-            lower = 0.0,
+            lower = 0.01,
             upper = 0.5,
+            q = 0.01,
             default_value = 0.1
         )
         perplexity = UniformFloatHyperparameter(
             name = "perplexity",
             lower = 1.0,
             upper = 100.0,
+            q = 0.5,
             default_value = 4.5
         )
         eps = UniformFloatHyperparameter(

@@ -67,25 +67,28 @@ class IForestClassifier(AutoSklearnClassificationAlgorithm):
         n_estimators = UniformIntegerHyperparameter(
             name = "n_estimators",
             lower = 2, # ad-hoc
-            upper = 500, # ad-hoc
+            upper = 200, # ad-hoc
             default_value = 100
         )
         max_samples = UniformFloatHyperparameter(
             name = "max_samples",
             lower = 0.1, # ad-hoc
             upper = 1.0,
+            q = 0.01,
             default_value = 1.0
         )
         max_features = UniformFloatHyperparameter(
             name = "max_features",
             lower = 0.1, # ad-hoc
             upper = 1.0,
+            q = 0.01,
             default_value = 1.0
         )
         contamination = UniformFloatHyperparameter(
             name = "contamination",
-            lower = 0.0,
+            lower = 0.01,
             upper = 0.5,
+            q = 0.01,
             default_value = 0.1
         )
         bootstrap = CategoricalHyperparameter(

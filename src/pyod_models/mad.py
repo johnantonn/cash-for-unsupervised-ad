@@ -58,6 +58,7 @@ class MADClassifier(AutoSklearnClassificationAlgorithm):
             name = "threshold", 
             lower = 0.0, # ad-hoc
             upper = 100.0, # ad-hoc
+            q = 5.0,
             default_value = 3.5
         )
         cs.add_hyperparameters([threshold])
