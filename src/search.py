@@ -88,7 +88,7 @@ class Search:
         )
 
     def run(self):
-        print('Running search for {}, strategy:{}'.format(
+        print('Running search for {}, strategy: {}'.format(
             self.d_name, self.validation_strategy))
         # Subsample if too large
         if(len(self.df) > self.max_samples):
@@ -138,6 +138,9 @@ class Search:
 
     def plot_scores(self):
         title = '{}_{}'.format(self.d_name, self.validation_strategy)
+        plots_dir = os.path.join(self.output_dir, 'plots')
+        if not os.path.exists(plots_dir):
+            os.makedirs(plots_dir)
         val_scores = self.automl.performance_over_time_[
             ['Timestamp', 'single_best_optimization_score']]
         test_scores = self.automl.performance_over_time_[
@@ -163,20 +166,26 @@ class Search:
         plt.title(title)
         plt.grid()
         plt.show()
-        plt.savefig(os.path.join(self.output_dir, title+'.png'))
+        plt.savefig(os.path.join(plots_dir, title+'.png'))
 
     def store_results(self):
         # filename
         title = '{}_{}'.format(self.d_name, self.validation_strategy)
+        cv_results_dir = os.path.join(self.output_dir, 'cv_results')
+        if not os.path.exists(cv_results_dir):
+            os.makedirs(cv_results_dir)
+        performance_dir = os.path.join(self.output_dir, 'performance')
+        if not os.path.exists(performance_dir):
+            os.makedirs(performance_dir)
         # automl.cv_results_
         cv_results_df = pd.DataFrame.from_dict(self.automl.cv_results_)
         cv_results_df.to_csv(os.path.join(
-            self.output_dir, title+'_cv_results.csv'), index=False)
+            cv_results_dir, title+'.csv'), index=False)
         # automl.performance_over_time_
         performance_over_time_df = pd.DataFrame.from_dict(
             self.automl.performance_over_time_)
         performance_over_time_df.to_csv(os.path.join(
-            self.output_dir, title+'_performance_over_time.csv'), index=False)
+            performance_dir, title+'.csv'), index=False)
 
 
 class SMACSearch(Search):

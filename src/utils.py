@@ -2,6 +2,7 @@ import os
 import pandas as pd
 from scipy.io import arff
 from matplotlib import pyplot as plt
+from datetime import timedelta as td
 from autosklearn.pipeline.components.classification import add_classifier
 
 
@@ -81,99 +82,106 @@ def add_pyod_models_to_pipeline():
     add_classifier(SOSClassifier)
 
 
-def create_search_space():
+def create_search_space(algos):
     """
     Create search space for random search.
 
     Args:
-        None
+        algos: the list of algorithms to include
 
     Returns:
         models: the included models
         search_space: the hyperparameter search space
-        evaluated: an initial array for evaluation
     """
     # Define PyOD algorithms
     models = {}  # default model instances
     search_space = {}  # the hyperparameter search space per algorithm
-    evaluated = {}  # number of times a model of this family was evaluated
     # ABOD
-    #from pyod_models.abod import ABODClassifier
-    #search_space['abod'] = ABODClassifier.get_hyperparameter_search_space()
-    #models['abod'] = ABODClassifier(**search_space['abod'].get_default_configuration())
-    #evaluated['abod'] = 0
+    if 'abod' in algos:
+        from pyod_models.abod import ABODClassifier
+        search_space['abod'] = ABODClassifier.get_hyperparameter_search_space()
+        models['abod'] = ABODClassifier(
+            **search_space['abod'].get_default_configuration())
     # CBLOF
-    from pyod_models.cblof import CBLOFClassifier
-    search_space['cblof'] = CBLOFClassifier.get_hyperparameter_search_space()
-    models['cblof'] = CBLOFClassifier(
-        **search_space['cblof'].get_default_configuration())
-    evaluated['cblof'] = 0
+    if 'cblof' in algos:
+        from pyod_models.cblof import CBLOFClassifier
+        search_space['cblof'] = CBLOFClassifier.get_hyperparameter_search_space()
+        models['cblof'] = CBLOFClassifier(
+            **search_space['cblof'].get_default_configuration())
     # COPOD
-    from pyod_models.copod import COPODClassifier
-    search_space['copod'] = COPODClassifier.get_hyperparameter_search_space()
-    models['copod'] = COPODClassifier(
-        **search_space['copod'].get_default_configuration())
-    evaluated['copod'] = 0
+    if 'copod' in algos:
+        from pyod_models.copod import COPODClassifier
+        search_space['copod'] = COPODClassifier.get_hyperparameter_search_space()
+        models['copod'] = COPODClassifier(
+            **search_space['copod'].get_default_configuration())
     # ECOD
-    #from pyod_models.ecod import ECODClassifier
-    #search_space['ecod'] = ECODClassifier.get_hyperparameter_search_space()
-    #models['ecod'] = ECODClassifier(**search_space['ecod'].get_default_configuration())
-    #evaluated['ecod'] = 0
+    if 'ecod' in algos:
+        from pyod_models.ecod import ECODClassifier
+        search_space['ecod'] = ECODClassifier.get_hyperparameter_search_space()
+        models['ecod'] = ECODClassifier(
+            **search_space['ecod'].get_default_configuration())
     # HBOS
-    #from pyod_models.hbos import HBOSClassifier
-    #search_space['hbos'] = HBOSClassifier.get_hyperparameter_search_space()
-    #models['hbos'] = HBOSClassifier(**search_space['hbos'].get_default_configuration())
-    #evaluated['hbos'] = 0
+    if 'hbos' in algos:
+        from pyod_models.hbos import HBOSClassifier
+        search_space['hbos'] = HBOSClassifier.get_hyperparameter_search_space()
+        models['hbos'] = HBOSClassifier(
+            **search_space['hbos'].get_default_configuration())
     # IForest
-    from pyod_models.iforest import IForestClassifier
-    search_space['ifor'] = IForestClassifier.get_hyperparameter_search_space()
-    models['ifor'] = IForestClassifier(
-        **search_space['ifor'].get_default_configuration())
-    evaluated['ifor'] = 0
+    if 'iforest' in algos:
+        from pyod_models.iforest import IForestClassifier
+        search_space['ifor'] = IForestClassifier.get_hyperparameter_search_space()
+        models['ifor'] = IForestClassifier(
+            **search_space['ifor'].get_default_configuration())
     # KNN
-    from pyod_models.knn import KNNClassifier
-    search_space['knn'] = KNNClassifier.get_hyperparameter_search_space()
-    models['knn'] = KNNClassifier(
-        **search_space['knn'].get_default_configuration())
-    evaluated['knn'] = 0
+    if 'knn' in algos:
+        from pyod_models.knn import KNNClassifier
+        search_space['knn'] = KNNClassifier.get_hyperparameter_search_space()
+        models['knn'] = KNNClassifier(
+            **search_space['knn'].get_default_configuration())
     # LMDD
-    #from pyod_models.lmdd import LMDDClassifier
-    #search_space['lmdd'] = LMDDClassifier.get_hyperparameter_search_space()
-    #models['lmdd'] = LMDDClassifier(**search_space['lmdd'].get_default_configuration())
-    #evaluated['lmdd'] = 0
+    if 'lmdd' in algos:
+        from pyod_models.lmdd import LMDDClassifier
+        search_space['lmdd'] = LMDDClassifier.get_hyperparameter_search_space()
+        models['lmdd'] = LMDDClassifier(
+            **search_space['lmdd'].get_default_configuration())
     # LOF
-    from pyod_models.lof import LOFClassifier
-    search_space['lof'] = LOFClassifier.get_hyperparameter_search_space()
-    models['lof'] = LOFClassifier(
-        **search_space['lof'].get_default_configuration())
-    evaluated['lof'] = 0
+    if 'lof' in algos:
+        from pyod_models.lof import LOFClassifier
+        search_space['lof'] = LOFClassifier.get_hyperparameter_search_space()
+        models['lof'] = LOFClassifier(
+            **search_space['lof'].get_default_configuration())
     # MCD
-    #from pyod_models.mcd import MCDClassifier
-    #search_space['mcd'] = MCDClassifier.get_hyperparameter_search_space()
-    #models['mcd'] = MCDClassifier(**search_space['mcd'].get_default_configuration())
-    #evaluated['mcd'] = 0
+    if 'mcd' in algos:
+        from pyod_models.mcd import MCDClassifier
+        search_space['mcd'] = MCDClassifier.get_hyperparameter_search_space()
+        models['mcd'] = MCDClassifier(
+            **search_space['mcd'].get_default_configuration())
     # OCSVM
-    #from pyod_models.ocsvm import OCSVMClassifier
-    #search_space['ocsvm'] = OCSVMClassifier.get_hyperparameter_search_space()
-    #models['ocsvm'] = OCSVMClassifier(**search_space['ocsvm'].get_default_configuration())
-    #evaluated['ocsvm'] = 0
+    if 'ocsvm' in algos:
+        from pyod_models.ocsvm import OCSVMClassifier
+        search_space['ocsvm'] = OCSVMClassifier.get_hyperparameter_search_space()
+        models['ocsvm'] = OCSVMClassifier(
+            **search_space['ocsvm'].get_default_configuration())
     # PCA
-    #from pyod_models.pca import PCAClassifier
-    #search_space['pca'] = PCAClassifier.get_hyperparameter_search_space()
-    #models['pca'] = PCAClassifier(**search_space['pca'].get_default_configuration())
-    #evaluated['pca'] = 0
+    if 'pca' in algos:
+        from pyod_models.pca import PCAClassifier
+        search_space['pca'] = PCAClassifier.get_hyperparameter_search_space()
+        models['pca'] = PCAClassifier(
+            **search_space['pca'].get_default_configuration())
     # ROD
-    #from pyod_models.rod import RODClassifier
-    #search_space['rod'] = RODClassifier.get_hyperparameter_search_space()
-    #models['rod'] = RODClassifier(**search_space['rod'].get_default_configuration())
-    #evaluated['rod'] = 0
+    if 'rod' in algos:
+        from pyod_models.rod import RODClassifier
+        search_space['rod'] = RODClassifier.get_hyperparameter_search_space()
+        models['rod'] = RODClassifier(
+            **search_space['rod'].get_default_configuration())
     # SOS
-    #from pyod_models.sos import SOSClassifier
-    #search_space['sos'] = SOSClassifier.get_hyperparameter_search_space()
-    #models['sos'] = SOSClassifier(**search_space['sos'].get_default_configuration())
-    #evaluated['sos'] = 0
+    if 'sos' in algos:
+        from pyod_models.sos import SOSClassifier
+        search_space['sos'] = SOSClassifier.get_hyperparameter_search_space()
+        models['sos'] = SOSClassifier(
+            **search_space['sos'].get_default_configuration())
     # return statement
-    return models, search_space, evaluated
+    return models, search_space
 
 
 def balanced_split(y, print_flag=False):
@@ -247,3 +255,40 @@ def get_metric_result(cv_results):
     cols.extend([key for key in cv_results.keys()
                  if key.startswith('metric_')])
     return results[cols].sort_values(['rank_test_scores'])
+
+
+def plot_performance(out_dirname, total_budget):
+    '''
+    Function that plots the combined search performance
+    over time.
+    '''
+    # Import csv files
+    path = os.path.join(os.path.dirname(__file__),
+                        'output', out_dirname, 'performance')
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 5))
+    for file in os.listdir(path):
+        df = pd.read_csv(os.path.join(path, file), parse_dates=['Timestamp'])
+        # Plot validation set performance
+        x1 = (df.Timestamp-df.Timestamp[0]).apply(td.total_seconds)
+        y1 = df.single_best_optimization_score
+        x1.at[x1.shape[0]] = total_budget
+        y1.at[y1.shape[0]] = y1.at[y1.shape[0]-1]
+        ax1.plot(x1, y1, label=file.split('.')[0])
+        ax1.set_ylim([0.5, 1.])
+        ax1.set_xlabel('seconds')
+        ax1.set_ylabel('score')
+        ax1.set_title('Performance on validation set')
+        ax1.grid()
+        # Plot test set performance
+        x2 = (df.Timestamp-df.Timestamp[0]).apply(td.total_seconds)
+        y2 = df.single_best_test_score
+        x2.at[x2.shape[0]] = total_budget
+        y2.at[y2.shape[0]] = y2.at[y2.shape[0]-1]
+        ax2.plot(x2, y2, label=file.split('.')[0])
+        ax2.set_ylim([0.5, 1.])
+        ax2.set_xlabel('seconds')
+        ax2.set_title('Performance on test set')
+        ax2.grid()
+    ax1.legend(loc='lower right')
+    ax2.legend(loc='lower right')
+    plt.savefig(os.path.join(path, 'all.png'))
