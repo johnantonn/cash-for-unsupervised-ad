@@ -19,7 +19,7 @@ if __name__ == "__main__":
     }
 
     # Algorithms to use
-    algos = [
+    classifiers = [
         'CBLOFClassifier',
         'COPODClassifier',
         'IForestClassifier',
@@ -28,13 +28,17 @@ if __name__ == "__main__":
     ]
 
     # Output directory based on current time
-    out_dirname = time.strftime("%Y%m%d_%H%M%S")
+    out_dir = time.strftime("%Y%m%d_%H%M%S")
 
-    # Total budget
+    # Max samples
+    max_samples = 5000
+
+    # Budget constraints
     total_budget = 300
+    per_run_budget = 30
 
     # Loop
-    for d_name, filename in datasets.items():
+    for name, filename in datasets.items():
 
         # Import dataset
         full_path = os.path.join(os.path.dirname(__file__), filename)
@@ -44,8 +48,17 @@ if __name__ == "__main__":
         for validation_strategy in ['stratified', 'balanced']:
 
             # Random search
-            random = RandomSearch(d_name+'_random', df, algos, validation_strategy,
-                                  total_budget=total_budget, out_dir=out_dirname)
+            d_name = name + '_random'
+            random = RandomSearch(
+                d_name=d_name,
+                df=df,
+                classifiers=classifiers,
+                validation_strategy=validation_strategy,
+                max_samples=max_samples,
+                total_budget=total_budget,
+                per_run_budget=per_run_budget,
+                out_dir=out_dir
+            )
             random.run()
             random.plot_scores()
             random.print_summary()
@@ -56,8 +69,17 @@ if __name__ == "__main__":
             # TODO
 
             # SMAC search
-            smac = SMACSearch(d_name+'_smac', df, algos, validation_strategy,
-                              total_budget=total_budget, out_dir=out_dirname)
+            d_name = name + '_smac'
+            smac = SMACSearch(
+                d_name=d_name,
+                df=df,
+                classifiers=classifiers,
+                validation_strategy=validation_strategy,
+                max_samples=max_samples,
+                total_budget=total_budget,
+                per_run_budget=per_run_budget,
+                out_dir=out_dir
+            )
             smac.run()
             smac.plot_scores()
             smac.print_summary()
@@ -65,4 +87,4 @@ if __name__ == "__main__":
             smac.store_results()
 
     # Plot multi-line performance graph
-    plot_performance(out_dirname, total_budget)
+    plot_performance(out_dir, total_budget)

@@ -97,85 +97,85 @@ def create_search_space(algos):
     models = {}  # default model instances
     search_space = {}  # the hyperparameter search space per algorithm
     # ABOD
-    if 'abod' in algos:
+    if 'ABODClassifier' in algos:
         from pyod_models.abod import ABODClassifier
         search_space['abod'] = ABODClassifier.get_hyperparameter_search_space()
         models['abod'] = ABODClassifier(
             **search_space['abod'].get_default_configuration())
     # CBLOF
-    if 'cblof' in algos:
+    if 'CBLOFClassifier' in algos:
         from pyod_models.cblof import CBLOFClassifier
         search_space['cblof'] = CBLOFClassifier.get_hyperparameter_search_space()
         models['cblof'] = CBLOFClassifier(
             **search_space['cblof'].get_default_configuration())
     # COPOD
-    if 'copod' in algos:
+    if 'COPODClassifier' in algos:
         from pyod_models.copod import COPODClassifier
         search_space['copod'] = COPODClassifier.get_hyperparameter_search_space()
         models['copod'] = COPODClassifier(
             **search_space['copod'].get_default_configuration())
     # ECOD
-    if 'ecod' in algos:
+    if 'ECODClassifier' in algos:
         from pyod_models.ecod import ECODClassifier
         search_space['ecod'] = ECODClassifier.get_hyperparameter_search_space()
         models['ecod'] = ECODClassifier(
             **search_space['ecod'].get_default_configuration())
     # HBOS
-    if 'hbos' in algos:
+    if 'HBOSClassifier' in algos:
         from pyod_models.hbos import HBOSClassifier
         search_space['hbos'] = HBOSClassifier.get_hyperparameter_search_space()
         models['hbos'] = HBOSClassifier(
             **search_space['hbos'].get_default_configuration())
     # IForest
-    if 'iforest' in algos:
+    if 'IForestClassifier' in algos:
         from pyod_models.iforest import IForestClassifier
         search_space['ifor'] = IForestClassifier.get_hyperparameter_search_space()
         models['ifor'] = IForestClassifier(
             **search_space['ifor'].get_default_configuration())
     # KNN
-    if 'knn' in algos:
+    if 'KNNClassifier' in algos:
         from pyod_models.knn import KNNClassifier
         search_space['knn'] = KNNClassifier.get_hyperparameter_search_space()
         models['knn'] = KNNClassifier(
             **search_space['knn'].get_default_configuration())
     # LMDD
-    if 'lmdd' in algos:
+    if 'LMDDClassifier' in algos:
         from pyod_models.lmdd import LMDDClassifier
         search_space['lmdd'] = LMDDClassifier.get_hyperparameter_search_space()
         models['lmdd'] = LMDDClassifier(
             **search_space['lmdd'].get_default_configuration())
     # LOF
-    if 'lof' in algos:
+    if 'LOFClassifier' in algos:
         from pyod_models.lof import LOFClassifier
         search_space['lof'] = LOFClassifier.get_hyperparameter_search_space()
         models['lof'] = LOFClassifier(
             **search_space['lof'].get_default_configuration())
     # MCD
-    if 'mcd' in algos:
+    if 'MCDClassifier' in algos:
         from pyod_models.mcd import MCDClassifier
         search_space['mcd'] = MCDClassifier.get_hyperparameter_search_space()
         models['mcd'] = MCDClassifier(
             **search_space['mcd'].get_default_configuration())
     # OCSVM
-    if 'ocsvm' in algos:
+    if 'OCSVMClassifier' in algos:
         from pyod_models.ocsvm import OCSVMClassifier
         search_space['ocsvm'] = OCSVMClassifier.get_hyperparameter_search_space()
         models['ocsvm'] = OCSVMClassifier(
             **search_space['ocsvm'].get_default_configuration())
     # PCA
-    if 'pca' in algos:
+    if 'PCAClassifier' in algos:
         from pyod_models.pca import PCAClassifier
         search_space['pca'] = PCAClassifier.get_hyperparameter_search_space()
         models['pca'] = PCAClassifier(
             **search_space['pca'].get_default_configuration())
     # ROD
-    if 'rod' in algos:
+    if 'RODClassifier' in algos:
         from pyod_models.rod import RODClassifier
         search_space['rod'] = RODClassifier.get_hyperparameter_search_space()
         models['rod'] = RODClassifier(
             **search_space['rod'].get_default_configuration())
     # SOS
-    if 'sos' in algos:
+    if 'SOSClassifier' in algos:
         from pyod_models.sos import SOSClassifier
         search_space['sos'] = SOSClassifier.get_hyperparameter_search_space()
         models['sos'] = SOSClassifier(

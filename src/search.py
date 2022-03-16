@@ -51,11 +51,11 @@ class NoPreprocessing(AutoSklearnPreprocessingAlgorithm):
 
 class Search:
 
-    def __init__(self, d_name, df, algos, max_samples, validation_strategy, total_budget,
+    def __init__(self, d_name, df, classifiers, max_samples, validation_strategy, total_budget,
                  per_run_budget, out_dir, random_state):
         self.d_name = d_name  # dataset name
         self.df = df  # dataframe
-        self.algos = algos  # PyOD algorithms to use
+        self.classifiers = classifiers  # PyOD algorithms to use
         self.max_samples = max_samples  # max samples
         self.validation_strategy = validation_strategy  # split strategy
         self.total_budget = total_budget  # total budget in seconds
@@ -72,7 +72,7 @@ class Search:
     def build_automl(self):
         return AutoSklearnClassifier(
             include={
-                'classifier': self.algos,
+                'classifier': self.classifiers,
                 'feature_preprocessor': ['no_preprocessing'],
                 'data_preprocessor': ['NoPreprocessing']
             },
@@ -190,19 +190,19 @@ class Search:
 
 class SMACSearch(Search):
 
-    def __init__(self, d_name, df, algos, validation_strategy, max_samples=5000,
+    def __init__(self, d_name, df, classifiers, validation_strategy, max_samples=5000,
                  total_budget=300, per_run_budget=30, out_dir='output', random_state=123):
         self.smac_object_callback = None
-        super().__init__(d_name, df, algos, max_samples, validation_strategy,
+        super().__init__(d_name, df, classifiers, max_samples, validation_strategy,
                          total_budget, per_run_budget, out_dir, random_state)
 
 
 class RandomSearch(Search):
 
-    def __init__(self, d_name, df, algos, validation_strategy, max_samples=5000,
+    def __init__(self, d_name, df, classifiers, validation_strategy, max_samples=5000,
                  total_budget=300, per_run_budget=30, out_dir='output', random_state=123):
         self.smac_object_callback = get_random_search_object_callback
-        super().__init__(d_name, df, algos, max_samples, validation_strategy,
+        super().__init__(d_name, df, classifiers, max_samples, validation_strategy,
                          total_budget, per_run_budget, out_dir, random_state)
 
 
