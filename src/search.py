@@ -1,18 +1,18 @@
-from ast import Raise
+import os
+import pandas as pd
+from matplotlib import pyplot as plt
+from datetime import timedelta as td
 from smac.facade.roar_facade import ROAR
 from smac.scenario.scenario import Scenario
-import autosklearn.pipeline.components.data_preprocessing
 from ConfigSpace.configuration_space import ConfigurationSpace
+from autosklearn.pipeline.components import data_preprocessing
 from autosklearn.pipeline.constants import SPARSE, DENSE, UNSIGNED_DATA, INPUT
 from autosklearn.pipeline.components.base import AutoSklearnPreprocessingAlgorithm
 from autosklearn.classification import AutoSklearnClassifier
 from autosklearn.metrics import roc_auc, average_precision
-from sklearn.model_selection import train_test_split
-from matplotlib import pyplot as plt
-import pandas as pd
-from datetime import timedelta as td
+from sklearn.model_selection import train_test_split, PredefinedSplit, \
+    StratifiedShuffleSplit
 from utils import balanced_split
-from sklearn.model_selection import PredefinedSplit, StratifiedShuffleSplit
 
 
 class NoPreprocessing(AutoSklearnPreprocessingAlgorithm):
@@ -51,7 +51,8 @@ class NoPreprocessing(AutoSklearnPreprocessingAlgorithm):
 
 class Search:
 
-    def __init__(self, d_name, df, algos, max_samples, validation_strategy, total_budget, per_run_budget, random_state):
+    def __init__(self, d_name, df, algos, max_samples, validation_strategy, total_budget,
+                 per_run_budget, out_dir, random_state):
         self.d_name = d_name  # dataset name
         self.df = df  # dataframe
         self.algos = algos  # PyOD algorithms to use
@@ -63,6 +64,10 @@ class Search:
         self.resampling_strategy = StratifiedShuffleSplit(
             n_splits=5, test_size=0.3)  # resampling strategy for optimization
         self.automl = None  # autosklearn classifier
+        self.output_dir = os.path.join(os.path.dirname(
+            __file__), 'output', out_dir)  # output directory
+        if not os.path.exists(self.output_dir):
+            os.makedirs(self.output_dir)
 
     def build_automl(self):
         return AutoSklearnClassifier(
@@ -83,7 +88,8 @@ class Search:
         )
 
     def run(self):
-        print('Running search for {}'.format(self.d_name))
+        print('Running search for {}, strategy:{}'.format(
+            self.d_name, self.validation_strategy))
         # Subsample if too large
         if(len(self.df) > self.max_samples):
             self.df = self.df.sample(n=self.max_samples)
@@ -105,7 +111,7 @@ class Search:
             raise ValueError('Invalid value `{}` for argument `resampling_strategy`'.format(
                 self.validation_strategy))
         # Add NoPreprocessing component to auto-sklearn.
-        autosklearn.pipeline.components.data_preprocessing.add_preprocessor(
+        data_preprocessing.add_preprocessor(
             NoPreprocessing)
         # build automl classifier
         self.automl = self.build_automl()
@@ -157,30 +163,38 @@ class Search:
         plt.title(title)
         plt.grid()
         plt.show()
-        plt.savefig(title+'.png')
+        plt.savefig(os.path.join(self.output_dir, title+'.png'))
 
     def store_results(self):
+        # filename
         title = '{}_{}'.format(self.d_name, self.validation_strategy)
-        results_df = pd.DataFrame.from_dict(self.automl.cv_results_)
-        results_df.to_csv(title+'.csv', index=False)
+        # automl.cv_results_
+        cv_results_df = pd.DataFrame.from_dict(self.automl.cv_results_)
+        cv_results_df.to_csv(os.path.join(
+            self.output_dir, title+'_cv_results.csv'), index=False)
+        # automl.performance_over_time_
+        performance_over_time_df = pd.DataFrame.from_dict(
+            self.automl.performance_over_time_)
+        performance_over_time_df.to_csv(os.path.join(
+            self.output_dir, title+'_performance_over_time.csv'), index=False)
 
 
 class SMACSearch(Search):
 
     def __init__(self, d_name, df, algos, validation_strategy, max_samples=5000,
-                 total_budget=300, per_run_budget=30, random_state=123):
+                 total_budget=300, per_run_budget=30, out_dir='output', random_state=123):
         self.smac_object_callback = None
         super().__init__(d_name, df, algos, max_samples, validation_strategy,
-                         total_budget, per_run_budget, random_state)
+                         total_budget, per_run_budget, out_dir, random_state)
 
 
 class RandomSearch(Search):
 
     def __init__(self, d_name, df, algos, validation_strategy, max_samples=5000,
-                 total_budget=300, per_run_budget=30, random_state=123):
+                 total_budget=300, per_run_budget=30, out_dir='output', random_state=123):
         self.smac_object_callback = get_random_search_object_callback
         super().__init__(d_name, df, algos, max_samples, validation_strategy,
-                         total_budget, per_run_budget, random_state)
+                         total_budget, per_run_budget, out_dir, random_state)
 
 
 def get_random_search_object_callback(

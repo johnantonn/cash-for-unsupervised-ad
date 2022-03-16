@@ -176,7 +176,7 @@ def create_search_space():
     return models, search_space, evaluated
 
 
-def balanced_split(y, print_flag=True):
+def balanced_split(y, print_flag=False):
     """ 
     Function that takes the target attribute values, y 
     and returns indices for training and validation, with
@@ -247,32 +247,3 @@ def get_metric_result(cv_results):
     cols.extend([key for key in cv_results.keys()
                  if key.startswith('metric_')])
     return results[cols].sort_values(['rank_test_scores'])
-
-
-def show_results(automl):
-    """ 
-    Takes as input an Auto-Sklearn estimator instance and
-    visualizes/prints performance metrics.
-
-    Args:
-        automl (dict): Auto-Sklearn estimator object
-
-    Returns:
-        None
-    """
-    print('Auto-Sklearn execution details')
-    print(automl.sprint_statistics())
-    print('Top ranked model')
-    print(automl.leaderboard(top_k=10))
-    print('Top ranked model configuration')
-    print(automl.show_models())
-    # Call get_metric_result
-    print(get_metric_result(automl.cv_results_).to_string(index=False))
-    # Plot of performance over time
-    automl.performance_over_time_.plot(
-        x='Timestamp',
-        kind='line',
-        legend=True,
-        title='Auto-sklearn ROC AUC score over time',
-        grid=True,
-    )

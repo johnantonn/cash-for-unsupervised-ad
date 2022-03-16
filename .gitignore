@@ -4,6 +4,9 @@
 # Input files
 data/*
 
+# Output
+**/output
+
 # Exceptions
 !data/.gitkeep
 
