@@ -40,16 +40,13 @@ if __name__ == "__main__":
 
     # Budget constraints
     # TODO: should be based estimated budget
-    total_budget = 300
-    per_run_budget = 15
+    total_budget = 600
+    per_run_budget = 30
 
     # Output directory (based on timestamp)
-    #out_dir = time.strftime("%Y%m%d_%H%M%S")
-    out_dir = '20220316_225203'
-    # Plot multi-line performance graph
-    plot_performance(out_dir, total_budget)
+    out_dir = time.strftime("%Y%m%d_%H%M%S")
 
-"""     # Loop
+    # Loop
     for name, filename in datasets.items():
 
         # Import dataset
@@ -97,4 +94,6 @@ if __name__ == "__main__":
             smac.print_summary()
             smac.print_rankings()
             smac.save_results()
- """
+
+    # Plot multi-line performance graph
+    plot_performance(out_dir, total_budget)
