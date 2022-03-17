@@ -80,7 +80,7 @@ class CBLOFClassifier(AutoSklearnClassificationAlgorithm):
         alpha = UniformFloatHyperparameter(
             name = "alpha",
             lower = 0.5,
-            upper = 1.0,
+            upper = 0.99,
             q = 0.01,
             default_value = 0.9
         )

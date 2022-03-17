@@ -84,6 +84,89 @@ def add_pyod_models_to_pipeline():
     add_classifier(SOSClassifier)
 
 
+def clf_lookup(clf_name):
+    """
+    Function that returns a classifier's object instance
+    given its name.
+
+    Args:
+        clf_name (str): the classifier name
+
+    Returns:
+        clf: the classifier's object instance
+    """
+    # ABOD
+    if clf_name == 'ABODClassifier':
+        from pyod_models.abod import ABODClassifier
+        return ABODClassifier(
+            **ABODClassifier.get_hyperparameter_search_space().get_default_configuration())
+    # CBLOF
+    if clf_name == 'CBLOFClassifier':
+        from pyod_models.cblof import CBLOFClassifier
+        return CBLOFClassifier(
+            **CBLOFClassifier.get_hyperparameter_search_space().get_default_configuration())
+    # COPOD
+    if clf_name == 'COPODClassifier':
+        from pyod_models.copod import COPODClassifier
+        return COPODClassifier(
+            **COPODClassifier.get_hyperparameter_search_space().get_default_configuration())
+    # ECOD
+    if clf_name == 'ECODClassifier':
+        from pyod_models.ecod import ECODClassifier
+        return ECODClassifier(
+            **ECODClassifier.get_hyperparameter_search_space().get_default_configuration())
+    # HBOS
+    if clf_name == 'HBOSClassifier':
+        from pyod_models.hbos import HBOSClassifier
+        return HBOSClassifier(
+            **HBOSClassifier.get_hyperparameter_search_space().get_default_configuration())
+    # IForest
+    if clf_name == 'IForestClassifier':
+        from pyod_models.iforest import IForestClassifier
+        return IForestClassifier(
+            **IForestClassifier.get_hyperparameter_search_space().get_default_configuration())
+    # KNN
+    if clf_name == 'KNNClassifier':
+        from pyod_models.knn import KNNClassifier
+        return KNNClassifier(
+            **KNNClassifier.get_hyperparameter_search_space().get_default_configuration())
+    # LMDD
+    if clf_name == 'LMDDClassifier':
+        from pyod_models.lmdd import LMDDClassifier
+        return LMDDClassifier(
+            **LMDDClassifier.get_hyperparameter_search_space().get_default_configuration())
+    # LOF
+    if clf_name == 'LOFClassifier':
+        from pyod_models.lof import LOFClassifier
+        return LOFClassifier(
+            **LOFClassifier.get_hyperparameter_search_space().get_default_configuration())
+    # MCD
+    if clf_name == 'MCDClassifier':
+        from pyod_models.mcd import MCDClassifier
+        return MCDClassifier(
+            **MCDClassifier.get_hyperparameter_search_space().get_default_configuration())
+    # OCSVM
+    if clf_name == 'OCSVMClassifier':
+        from pyod_models.ocsvm import OCSVMClassifier
+        return OCSVMClassifier(
+            **OCSVMClassifier.get_hyperparameter_search_space().get_default_configuration())
+    # PCA
+    if clf_name == 'PCAClassifier':
+        from pyod_models.pca import PCAClassifier
+        return PCAClassifier(
+            **PCAClassifier.get_hyperparameter_search_space().get_default_configuration())
+    # ROD
+    if clf_name == 'RODClassifier':
+        from pyod_models.rod import RODClassifier
+        return RODClassifier(
+            **RODClassifier.get_hyperparameter_search_space().get_default_configuration())
+    # SOS
+    if clf_name == 'SOSClassifier':
+        from pyod_models.sos import SOSClassifier
+        return SOSClassifier(
+            **SOSClassifier.get_hyperparameter_search_space().get_default_configuration())
+
+
 def get_search_space(clf_name):
     """
     Function that returns the hyperparameter search space
