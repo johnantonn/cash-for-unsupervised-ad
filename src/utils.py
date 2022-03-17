@@ -335,30 +335,49 @@ def plot_performance(out_dirname, total_budget):
     # Import csv files
     path = os.path.join(os.path.dirname(__file__),
                         'output', out_dirname, 'performance')
-    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 5))
+    fig, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2, 2, figsize=(12, 10))
     for file in os.listdir(path):
         df = pd.read_csv(os.path.join(path, file), parse_dates=['Timestamp'])
-        # Plot validation set performance
-        x1 = (df.Timestamp-df.Timestamp[0]).apply(td.total_seconds)
-        y1 = df.single_best_optimization_score
-        x1.at[x1.shape[0]] = total_budget
-        y1.at[y1.shape[0]] = y1.at[y1.shape[0]-1]
-        ax1.plot(x1, y1, label=file.split('.')[0])
-        ax1.set_ylim([0.5, 1.])
-        ax1.set_xlabel('seconds')
-        ax1.set_ylabel('score')
-        ax1.set_title('Performance on validation set')
-        ax1.grid()
-        # Plot test set performance
-        x2 = (df.Timestamp-df.Timestamp[0]).apply(td.total_seconds)
-        y2 = df.single_best_test_score
-        x2.at[x2.shape[0]] = total_budget
-        y2.at[y2.shape[0]] = y2.at[y2.shape[0]-1]
-        ax2.plot(x2, y2, label=file.split('.')[0])
-        ax2.set_ylim([0.5, 1.])
-        ax2.set_xlabel('seconds')
-        ax2.set_title('Performance on test set')
-        ax2.grid()
+        # validation score
+        x = (df.Timestamp-df.Timestamp[0]).apply(td.total_seconds)
+        x.at[x.shape[0]] = total_budget
+        yval = df.single_best_optimization_score
+        yval.at[yval.shape[0]] = yval.at[yval.shape[0]-1]
+        # test score
+        ytest = df.single_best_test_score
+        ytest.at[ytest.shape[0]] = ytest.at[ytest.shape[0]-1]
+        if 'balanced' in file:
+            ax1.plot(x, yval, label=file.split('.')[0])
+            ax1.set_ylim([0.5, 1.])
+            ax1.set_xlabel('seconds')
+            ax1.set_ylabel('score')
+            ax1.set_title('balanced-validation')
+            ax1.grid()
+            ax2.plot(x, ytest, label=file.split('.')[0])
+            ax2.set_ylim([0.5, 1.])
+            ax2.set_xlabel('seconds')
+            ax2.set_title('balanced-test')
+            ax2.grid()
+        elif 'stratified' in file:
+            ax3.plot(x, yval, label=file.split('.')[0])
+            ax3.set_ylim([0.5, 1.])
+            ax3.set_xlabel('seconds')
+            ax3.set_ylabel('score')
+            ax3.set_title('stratified-validation')
+            ax3.grid()
+            ax4.plot(x, ytest, label=file.split('.')[0])
+            ax4.set_ylim([0.5, 1.])
+            ax4.set_xlabel('seconds')
+            ax4.set_title('stratified-test')
+            ax4.grid()
     ax1.legend(loc='lower right')
     ax2.legend(loc='lower right')
+    ax3.legend(loc='lower right')
+    ax4.legend(loc='lower right')
+    # sort both labels and handles by labels
+    for ax in [ax1, ax2, ax3, ax4]:
+        handles, labels = ax.get_legend_handles_labels()
+        labels, handles = zip(
+            *sorted(zip(labels, handles), key=lambda t: t[0]))
+        ax.legend(handles, labels)
     plt.savefig(os.path.join(path, 'all.png'))

@@ -2,7 +2,7 @@ import os
 import time
 from search import SMACSearch, RandomSearch
 from utils import import_dataset, add_pyod_models_to_pipeline, \
-    plot_performance, get_search_space_size
+    get_search_space_size, plot_performance
 
 
 if __name__ == "__main__":
@@ -40,13 +40,16 @@ if __name__ == "__main__":
 
     # Budget constraints
     # TODO: should be based estimated budget
-    total_budget = 30
+    total_budget = 300
     per_run_budget = 15
 
     # Output directory (based on timestamp)
-    out_dir = time.strftime("%Y%m%d_%H%M%S")
+    #out_dir = time.strftime("%Y%m%d_%H%M%S")
+    out_dir = '20220316_225203'
+    # Plot multi-line performance graph
+    plot_performance(out_dir, total_budget)
 
-    # Loop
+"""     # Loop
     for name, filename in datasets.items():
 
         # Import dataset
@@ -94,6 +97,4 @@ if __name__ == "__main__":
             smac.print_summary()
             smac.print_rankings()
             smac.save_results()
-
-    # Plot multi-line performance graph
-    plot_performance(out_dir, total_budget)
+ """
