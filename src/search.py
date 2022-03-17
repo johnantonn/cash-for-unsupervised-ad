@@ -1,3 +1,4 @@
+from ast import Return
 import os
 import pandas as pd
 from matplotlib import pyplot as plt
@@ -12,7 +13,7 @@ from autosklearn.classification import AutoSklearnClassifier
 from autosklearn.metrics import roc_auc, average_precision
 from sklearn.model_selection import train_test_split, PredefinedSplit, \
     StratifiedShuffleSplit
-from utils import balanced_split
+from utils import balanced_split, get_search_space
 
 
 class NoPreprocessing(AutoSklearnPreprocessingAlgorithm):
@@ -96,10 +97,10 @@ class Search:
         # Extract X, y
         X = self.df.iloc[:, :-1]
         y = self.df['outlier']
-        # Split to train, test
+        # Split to train/test
         X_train, X_test, y_train, y_test = train_test_split(
             X, y, test_size=0.3, stratify=y, random_state=self.random_state)
-        # resampling strategy
+        # Resampling strategy
         if self.validation_strategy == 'stratified':
             self.resampling_strategy = StratifiedShuffleSplit(
                 n_splits=5, test_size=0.3)
@@ -110,12 +111,11 @@ class Search:
         else:
             raise ValueError('Invalid value `{}` for argument `resampling_strategy`'.format(
                 self.validation_strategy))
-        # Add NoPreprocessing component to auto-sklearn.
+        # Add NoPreprocessing component to auto-sklearn
         data_preprocessing.add_preprocessor(
             NoPreprocessing)
-        # build automl classifier
+        # Build automl classifier
         self.automl = self.build_automl()
-        # fit
         self.automl.fit(X_train, y_train, X_test,
                         y_test, dataset_name=self.d_name)
 
@@ -124,6 +124,7 @@ class Search:
 
     def print_rankings(self):
         results = pd.DataFrame.from_dict(self.automl.cv_results_)
+        # Columns to include
         cols = [
             'rank_test_scores',
             'status',
@@ -137,10 +138,12 @@ class Search:
             ['rank_test_scores']).to_string(index=False))
 
     def plot_scores(self):
+        # Filename and directory
         title = '{}_{}'.format(self.d_name, self.validation_strategy)
         plots_dir = os.path.join(self.output_dir, 'plots')
         if not os.path.exists(plots_dir):
             os.makedirs(plots_dir)
+        # Extract scores
         val_scores = self.automl.performance_over_time_[
             ['Timestamp', 'single_best_optimization_score']]
         test_scores = self.automl.performance_over_time_[
@@ -151,11 +154,12 @@ class Search:
         xtest = (test_scores.Timestamp -
                  test_scores.Timestamp[0]).apply(td.total_seconds)
         ytest = test_scores.single_best_test_score
-        # modify for plotting
+        # Modify scores for better plotting
         xval.at[xval.shape[0]] = self.total_budget
         yval.at[yval.shape[0]] = yval.at[yval.shape[0]-1]
         xtest.at[xtest.shape[0]] = self.total_budget
         ytest.at[ytest.shape[0]] = ytest.at[ytest.shape[0]-1]
+        # Plot
         plt.figure()
         plt.plot(xval, yval)
         plt.plot(xtest, ytest)
@@ -168,8 +172,8 @@ class Search:
         plt.show()
         plt.savefig(os.path.join(plots_dir, title+'.png'))
 
-    def store_results(self):
-        # filename
+    def save_results(self):
+        # Filename
         title = '{}_{}'.format(self.d_name, self.validation_strategy)
         cv_results_dir = os.path.join(self.output_dir, 'cv_results')
         if not os.path.exists(cv_results_dir):
@@ -216,11 +220,11 @@ def get_random_search_object_callback(
     dask_client
 ):
     """ Random search """
-
+    # Reduntant check
     if n_jobs > 1 or (dask_client and len(dask_client.nthreads()) > 1):
         raise ValueError("Please make sure to guard the code invoking Auto-sklearn by "
                          "`if __name__ == '__main__'` and remove this exception.")
-
+    # Setup
     scenario_dict['minR'] = len(scenario_dict['instances'])
     scenario_dict['initial_incumbent'] = 'RANDOM'
     scenario = Scenario(scenario_dict)

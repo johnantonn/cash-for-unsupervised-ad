@@ -8,7 +8,8 @@ from autosklearn.pipeline.components.classification import add_classifier
 
 def import_dataset(filepath):
     """ 
-    Function that reads a arff-formatted dataset and returns a dataframe.
+    Function that reads a arff-formatted dataset
+    and returns a dataframe.
 
     Args:
         filename (str): The name of the file
@@ -34,7 +35,8 @@ def import_dataset(filepath):
 
 def add_pyod_models_to_pipeline():
     """ 
-    Function that imports the external PyOD models and adds them to Aut-Sklearn.
+    Function that imports the external PyOD models
+    and adds them to Aut-Sklearn.
 
     Args:
         None
@@ -82,106 +84,91 @@ def add_pyod_models_to_pipeline():
     add_classifier(SOSClassifier)
 
 
-def create_search_space(algos):
+def get_search_space(clf_name):
     """
-    Create search space for random search.
+    Function that returns the hyperparameter search space
+    of a classifier whose name is provided as an argument.
 
     Args:
-        algos: the list of algorithms to include
+        clf_name (str): the classifier name
 
     Returns:
-        models: the included models
-        search_space: the hyperparameter search space
+        search_space: the classifier's search space
     """
-    # Define PyOD algorithms
-    models = {}  # default model instances
-    search_space = {}  # the hyperparameter search space per algorithm
     # ABOD
-    if 'ABODClassifier' in algos:
+    if clf_name == 'ABODClassifier':
         from pyod_models.abod import ABODClassifier
-        search_space['abod'] = ABODClassifier.get_hyperparameter_search_space()
-        models['abod'] = ABODClassifier(
-            **search_space['abod'].get_default_configuration())
+        return ABODClassifier.get_hyperparameter_search_space()
     # CBLOF
-    if 'CBLOFClassifier' in algos:
+    if clf_name == 'CBLOFClassifier':
         from pyod_models.cblof import CBLOFClassifier
-        search_space['cblof'] = CBLOFClassifier.get_hyperparameter_search_space()
-        models['cblof'] = CBLOFClassifier(
-            **search_space['cblof'].get_default_configuration())
+        return CBLOFClassifier.get_hyperparameter_search_space()
     # COPOD
-    if 'COPODClassifier' in algos:
+    if clf_name == 'COPODClassifier':
         from pyod_models.copod import COPODClassifier
-        search_space['copod'] = COPODClassifier.get_hyperparameter_search_space()
-        models['copod'] = COPODClassifier(
-            **search_space['copod'].get_default_configuration())
+        return COPODClassifier.get_hyperparameter_search_space()
     # ECOD
-    if 'ECODClassifier' in algos:
+    if clf_name == 'ECODClassifier':
         from pyod_models.ecod import ECODClassifier
-        search_space['ecod'] = ECODClassifier.get_hyperparameter_search_space()
-        models['ecod'] = ECODClassifier(
-            **search_space['ecod'].get_default_configuration())
+        return ECODClassifier.get_hyperparameter_search_space()
     # HBOS
-    if 'HBOSClassifier' in algos:
+    if clf_name == 'HBOSClassifier':
         from pyod_models.hbos import HBOSClassifier
-        search_space['hbos'] = HBOSClassifier.get_hyperparameter_search_space()
-        models['hbos'] = HBOSClassifier(
-            **search_space['hbos'].get_default_configuration())
+        return HBOSClassifier.get_hyperparameter_search_space()
     # IForest
-    if 'IForestClassifier' in algos:
+    if clf_name == 'IForestClassifier':
         from pyod_models.iforest import IForestClassifier
-        search_space['ifor'] = IForestClassifier.get_hyperparameter_search_space()
-        models['ifor'] = IForestClassifier(
-            **search_space['ifor'].get_default_configuration())
+        return IForestClassifier.get_hyperparameter_search_space()
     # KNN
-    if 'KNNClassifier' in algos:
+    if clf_name == 'KNNClassifier':
         from pyod_models.knn import KNNClassifier
-        search_space['knn'] = KNNClassifier.get_hyperparameter_search_space()
-        models['knn'] = KNNClassifier(
-            **search_space['knn'].get_default_configuration())
+        return KNNClassifier.get_hyperparameter_search_space()
     # LMDD
-    if 'LMDDClassifier' in algos:
+    if clf_name == 'LMDDClassifier':
         from pyod_models.lmdd import LMDDClassifier
-        search_space['lmdd'] = LMDDClassifier.get_hyperparameter_search_space()
-        models['lmdd'] = LMDDClassifier(
-            **search_space['lmdd'].get_default_configuration())
+        return LMDDClassifier.get_hyperparameter_search_space()
     # LOF
-    if 'LOFClassifier' in algos:
+    if clf_name == 'LOFClassifier':
         from pyod_models.lof import LOFClassifier
-        search_space['lof'] = LOFClassifier.get_hyperparameter_search_space()
-        models['lof'] = LOFClassifier(
-            **search_space['lof'].get_default_configuration())
+        return LOFClassifier.get_hyperparameter_search_space()
     # MCD
-    if 'MCDClassifier' in algos:
+    if clf_name == 'MCDClassifier':
         from pyod_models.mcd import MCDClassifier
-        search_space['mcd'] = MCDClassifier.get_hyperparameter_search_space()
-        models['mcd'] = MCDClassifier(
-            **search_space['mcd'].get_default_configuration())
+        return MCDClassifier.get_hyperparameter_search_space()
     # OCSVM
-    if 'OCSVMClassifier' in algos:
+    if clf_name == 'OCSVMClassifier':
         from pyod_models.ocsvm import OCSVMClassifier
-        search_space['ocsvm'] = OCSVMClassifier.get_hyperparameter_search_space()
-        models['ocsvm'] = OCSVMClassifier(
-            **search_space['ocsvm'].get_default_configuration())
+        return OCSVMClassifier.get_hyperparameter_search_space()
     # PCA
-    if 'PCAClassifier' in algos:
+    if clf_name == 'PCAClassifier':
         from pyod_models.pca import PCAClassifier
-        search_space['pca'] = PCAClassifier.get_hyperparameter_search_space()
-        models['pca'] = PCAClassifier(
-            **search_space['pca'].get_default_configuration())
+        return PCAClassifier.get_hyperparameter_search_space()
     # ROD
-    if 'RODClassifier' in algos:
+    if clf_name == 'RODClassifier':
         from pyod_models.rod import RODClassifier
-        search_space['rod'] = RODClassifier.get_hyperparameter_search_space()
-        models['rod'] = RODClassifier(
-            **search_space['rod'].get_default_configuration())
+        return RODClassifier.get_hyperparameter_search_space()
     # SOS
-    if 'SOSClassifier' in algos:
+    if clf_name == 'SOSClassifier':
         from pyod_models.sos import SOSClassifier
-        search_space['sos'] = SOSClassifier.get_hyperparameter_search_space()
-        models['sos'] = SOSClassifier(
-            **search_space['sos'].get_default_configuration())
-    # return statement
-    return models, search_space
+        return SOSClassifier.get_hyperparameter_search_space()
+
+
+def get_search_space_size(clf_list):
+    """
+    Function that calculates and returns the estimated size 
+    of the hyperparameter search space defined by the provided
+    list of algorithms.
+
+    Args:
+        clf_list (list): the list of classifiers
+
+    Returns:
+        size: the estimated size of the combined search space
+    """
+    size = 0
+    for clf in clf_list:
+        size += get_search_space(clf).estimate_size()
+    return size
 
 
 def balanced_split(y, print_flag=False):

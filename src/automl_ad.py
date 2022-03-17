@@ -1,7 +1,8 @@
 import os
 import time
 from search import SMACSearch, RandomSearch
-from utils import import_dataset, add_pyod_models_to_pipeline, plot_performance
+from utils import import_dataset, add_pyod_models_to_pipeline, \
+    plot_performance, get_search_space_size
 
 
 if __name__ == "__main__":
@@ -18,7 +19,10 @@ if __name__ == "__main__":
         # 'cardio_22': '../data/Cardiotocography_withoutdupl_norm_22.arff'
     }
 
-    # Algorithms to use
+    # Max samples
+    max_samples = 5000
+
+    # PyOD algorithms to use
     classifiers = [
         'CBLOFClassifier',
         'COPODClassifier',
@@ -27,15 +31,20 @@ if __name__ == "__main__":
         'LOFClassifier',
     ]
 
-    # Output directory based on current time
-    out_dir = time.strftime("%Y%m%d_%H%M%S")
+    # Hyperparameter search space size
+    sp_size = get_search_space_size(classifiers)
+    print('Estimated hyperparameter search space size:', sp_size)
 
-    # Max samples
-    max_samples = 5000
+    # Budget estimation
+    # TODO
 
     # Budget constraints
-    total_budget = 300
-    per_run_budget = 30
+    # TODO: should be based estimated budget
+    total_budget = 30
+    per_run_budget = 15
+
+    # Output directory (based on timestamp)
+    out_dir = time.strftime("%Y%m%d_%H%M%S")
 
     # Loop
     for name, filename in datasets.items():
@@ -63,7 +72,7 @@ if __name__ == "__main__":
             random.plot_scores()
             random.print_summary()
             random.print_rankings()
-            random.store_results()
+            random.save_results()
 
             # Equally distributed budget search
             # TODO
@@ -84,7 +93,7 @@ if __name__ == "__main__":
             smac.plot_scores()
             smac.print_summary()
             smac.print_rankings()
-            smac.store_results()
+            smac.save_results()
 
     # Plot multi-line performance graph
     plot_performance(out_dir, total_budget)
