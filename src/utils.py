@@ -380,4 +380,5 @@ def plot_performance(out_dirname, total_budget):
         labels, handles = zip(
             *sorted(zip(labels, handles), key=lambda t: t[0]))
         ax.legend(handles, labels)
-    plt.savefig(os.path.join(path, 'all.png'))
+    fig_title = 'all_' + str(total_budget) + '.png'
+    plt.savefig(os.path.join(path, fig_title))
