@@ -1,6 +1,6 @@
 from ConfigSpace.configuration_space import ConfigurationSpace
 from ConfigSpace.hyperparameters import UniformIntegerHyperparameter, \
-    UniformFloatHyperparameter
+    UniformFloatHyperparameter, Constant
 
 from autosklearn.pipeline.components.base import AutoSklearnClassificationAlgorithm
 from autosklearn.pipeline.constants import DENSE, SPARSE, UNSIGNED_DATA, PREDICTIONS
@@ -66,11 +66,9 @@ class LOFClassifier(AutoSklearnClassificationAlgorithm):
             default_value = 20
         )
         # order of minkowski distance metric (used by default)
-        p = UniformIntegerHyperparameter(
+        p = Constant(
             name = "p",
-            lower = 1, # manhattan
-            upper = 2, # euclidean
-            default_value = 2
+            value = 2 # euclidean
         )
         contamination = UniformFloatHyperparameter(
             name = "contamination",

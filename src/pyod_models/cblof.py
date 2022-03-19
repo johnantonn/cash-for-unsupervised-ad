@@ -1,6 +1,6 @@
 from ConfigSpace.configuration_space import ConfigurationSpace
 from ConfigSpace.hyperparameters import UniformIntegerHyperparameter, \
-    UniformFloatHyperparameter, CategoricalHyperparameter
+    UniformFloatHyperparameter, Constant
 
 from autosklearn.pipeline.components.base import AutoSklearnClassificationAlgorithm
 from autosklearn.pipeline.constants import DENSE, SPARSE, UNSIGNED_DATA, PREDICTIONS
@@ -67,7 +67,8 @@ class CBLOFClassifier(AutoSklearnClassificationAlgorithm):
         n_clusters  = UniformIntegerHyperparameter(
             name = "n_clusters",
             lower = 2,
-            upper = 20, # ad-hoc
+            upper = 16, # ad-hoc
+            q = 2,
             default_value = 8
         )
         contamination = UniformFloatHyperparameter(
@@ -80,20 +81,19 @@ class CBLOFClassifier(AutoSklearnClassificationAlgorithm):
         alpha = UniformFloatHyperparameter(
             name = "alpha",
             lower = 0.5,
-            upper = 0.99,
-            q = 0.01,
+            upper = 1.0,
+            q = 0.1,
             default_value = 0.9
         )
         beta = UniformIntegerHyperparameter(
             name = "beta",
-            lower = 1,
-            upper = 100, # ad-hoc
+            lower = 2,
+            upper = 10, # ad-hoc
             default_value = 5
         )
-        use_weights = CategoricalHyperparameter(
+        use_weights = Constant(
             name = "use_weights",
-            choices = [True, False],
-            default_value = False
+            value = "False"
         )
         cs.add_hyperparameters([n_clusters, contamination, alpha, beta, use_weights])
 

@@ -1,6 +1,6 @@
 from ConfigSpace.configuration_space import ConfigurationSpace
 from ConfigSpace.hyperparameters import UniformIntegerHyperparameter, \
-    UniformFloatHyperparameter, CategoricalHyperparameter
+    UniformFloatHyperparameter, Constant
 
 from autosklearn.pipeline.components.base import AutoSklearnClassificationAlgorithm
 from autosklearn.pipeline.constants import DENSE, SPARSE, UNSIGNED_DATA, PREDICTIONS
@@ -66,23 +66,21 @@ class IForestClassifier(AutoSklearnClassificationAlgorithm):
 
         n_estimators = UniformIntegerHyperparameter(
             name = "n_estimators",
-            lower = 2, # ad-hoc
+            lower = 5, # ad-hoc
             upper = 200, # ad-hoc
+            q = 5, # step
             default_value = 100
         )
         max_samples = UniformFloatHyperparameter(
             name = "max_samples",
-            lower = 0.1, # ad-hoc
+            lower = 0.2, # ad-hoc
             upper = 1.0,
-            q = 0.01,
+            q = 0.2,
             default_value = 1.0
         )
-        max_features = UniformFloatHyperparameter(
+        max_features = Constant(
             name = "max_features",
-            lower = 0.1, # ad-hoc
-            upper = 1.0,
-            q = 0.01,
-            default_value = 1.0
+            value = 1.0,
         )
         contamination = UniformFloatHyperparameter(
             name = "contamination",
@@ -91,10 +89,9 @@ class IForestClassifier(AutoSklearnClassificationAlgorithm):
             q = 0.01,
             default_value = 0.1
         )
-        bootstrap = CategoricalHyperparameter(
+        bootstrap = Constant(
             name = "bootstrap", 
-            choices = [True, False],
-            default_value = False
+            value = "False"
         )
         cs.add_hyperparameters([n_estimators, max_samples, max_features, contamination, bootstrap])
 

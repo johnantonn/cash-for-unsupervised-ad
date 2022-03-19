@@ -68,8 +68,9 @@ class LMDDClassifier(AutoSklearnClassificationAlgorithm):
         )
         n_iter = UniformIntegerHyperparameter(
             name = "n_iter",
-            lower = 1,
+            lower = 5,
             upper = 200, # ad-hoc
+            q = 5,
             default_value = 50
         )
         dis_measure = CategoricalHyperparameter(

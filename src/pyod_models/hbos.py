@@ -1,6 +1,6 @@
 from ConfigSpace.configuration_space import ConfigurationSpace
 from ConfigSpace.hyperparameters import UniformIntegerHyperparameter, \
-    UniformFloatHyperparameter
+    UniformFloatHyperparameter, Constant
 
 from autosklearn.pipeline.components.base import AutoSklearnClassificationAlgorithm
 from autosklearn.pipeline.constants import DENSE, SPARSE, UNSIGNED_DATA, PREDICTIONS
@@ -61,24 +61,22 @@ class HBOSClassifier(AutoSklearnClassificationAlgorithm):
     def get_hyperparameter_search_space(dataset_properties=None):
         cs = ConfigurationSpace()
 
-        n_bins = UniformIntegerHyperparameter(
+        n_bins = Constant(
             name = "n_bins", 
-            lower = 2, # ad-hoc
-            upper = 200, # ad-hoc
-            default_value = 10
+            value = "auto"
         )
         alpha = UniformFloatHyperparameter(
             name = "alpha",
-            lower = 0.0,
+            lower = 0.1,
             upper = 1.0,
-            q = 0.01,
+            q = 0.1,
             default_value = 0.1
         )
         tol = UniformFloatHyperparameter(
             name = "tol",
-            lower = 0.01,
+            lower = 0.1,
             upper = 1.0,
-            q = 0.01,
+            q = 0.1,
             default_value = 0.5
         )
         contamination = UniformFloatHyperparameter(
