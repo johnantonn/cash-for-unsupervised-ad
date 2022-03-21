@@ -5,6 +5,7 @@ from ConfigSpace.hyperparameters import UniformIntegerHyperparameter, \
 from autosklearn.pipeline.components.base import AutoSklearnClassificationAlgorithm
 from autosklearn.pipeline.constants import DENSE, SPARSE, UNSIGNED_DATA, PREDICTIONS
 
+
 class LOFClassifier(AutoSklearnClassificationAlgorithm):
 
     def __init__(self, n_neighbors, p, contamination, random_state=None):
@@ -18,9 +19,9 @@ class LOFClassifier(AutoSklearnClassificationAlgorithm):
         from pyod.models.lof import LOF
 
         self.estimator = LOF(
-            n_neighbors = self.n_neighbors,
-            p = self.p,
-            contamination = self.contamination
+            n_neighbors=self.n_neighbors,
+            p=self.p,
+            contamination=self.contamination
         )
         self.estimator.fit(X, Y)
         return self
@@ -60,22 +61,22 @@ class LOFClassifier(AutoSklearnClassificationAlgorithm):
         cs = ConfigurationSpace()
 
         n_neighbors = UniformIntegerHyperparameter(
-            name = "n_neighbors",
-            lower = 1,
-            upper = 100, # ad-hoc
-            default_value = 20
+            name="n_neighbors",
+            lower=1,
+            upper=100,  # ad-hoc
+            default_value=20
         )
         # order of minkowski distance metric (used by default)
         p = Constant(
-            name = "p",
-            value = 2 # euclidean
+            name="p",
+            value=2  # euclidean
         )
         contamination = UniformFloatHyperparameter(
-            name = "contamination",
-            lower = 0.01,
-            upper = 0.5,
-            q = 0.01,
-            default_value = 0.1
+            name="contamination",
+            lower=0.01,
+            upper=0.5,
+            q=0.01,
+            default_value=0.1
         )
         cs.add_hyperparameters([n_neighbors, p, contamination])
 

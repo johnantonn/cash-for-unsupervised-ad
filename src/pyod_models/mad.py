@@ -4,6 +4,7 @@ from ConfigSpace.hyperparameters import UniformFloatHyperparameter
 from autosklearn.pipeline.components.base import AutoSklearnClassificationAlgorithm
 from autosklearn.pipeline.constants import DENSE, SPARSE, UNSIGNED_DATA, PREDICTIONS
 
+
 class MADClassifier(AutoSklearnClassificationAlgorithm):
 
     def __init__(self, threshold, random_state=None):
@@ -15,7 +16,7 @@ class MADClassifier(AutoSklearnClassificationAlgorithm):
         from pyod.models.mad import MAD
 
         self.estimator = MAD(
-            threshold = self.threshold
+            threshold=self.threshold
         )
         self.estimator.fit(X, Y)
         return self
@@ -55,11 +56,11 @@ class MADClassifier(AutoSklearnClassificationAlgorithm):
         cs = ConfigurationSpace()
 
         threshold = UniformFloatHyperparameter(
-            name = "threshold", 
-            lower = 0.0, # ad-hoc
-            upper = 100.0, # ad-hoc
-            q = 5.0,
-            default_value = 3.5
+            name="threshold",
+            lower=0.0,  # ad-hoc
+            upper=100.0,  # ad-hoc
+            q=5.0,
+            default_value=3.5
         )
         cs.add_hyperparameters([threshold])
         return cs

@@ -6,9 +6,10 @@ from ConfigSpace.hyperparameters import UniformIntegerHyperparameter, \
 from autosklearn.pipeline.components.base import AutoSklearnClassificationAlgorithm
 from autosklearn.pipeline.constants import DENSE, SPARSE, UNSIGNED_DATA, PREDICTIONS
 
+
 class OCSVMClassifier(AutoSklearnClassificationAlgorithm):
 
-    def __init__(self, kernel, nu, gamma, shrinking, tol, contamination, 
+    def __init__(self, kernel, nu, gamma, shrinking, tol, contamination,
                  degree=3, coef0=1, random_state=None):
         self.kernel = kernel
         self.nu = nu
@@ -25,14 +26,14 @@ class OCSVMClassifier(AutoSklearnClassificationAlgorithm):
         from pyod.models.ocsvm import OCSVM
 
         self.estimator = OCSVM(
-            kernel = self.kernel,
-            nu = self.nu,
-            degree = self.degree,
-            coef0 = self.coef0,
-            gamma = self.gamma,
-            shrinking = self.shrinking,
-            tol = self.tol,
-            contamination = self.contamination
+            kernel=self.kernel,
+            nu=self.nu,
+            degree=self.degree,
+            coef0=self.coef0,
+            gamma=self.gamma,
+            shrinking=self.shrinking,
+            tol=self.tol,
+            contamination=self.contamination
         )
         self.estimator.fit(X, Y)
         return self
@@ -72,55 +73,55 @@ class OCSVMClassifier(AutoSklearnClassificationAlgorithm):
         cs = ConfigurationSpace()
 
         kernel = CategoricalHyperparameter(
-            name = "kernel",
-            choices = ["rbf", "poly", "sigmoid"],
-            default_value= "rbf"
+            name="kernel",
+            choices=["rbf", "poly", "sigmoid"],
+            default_value="rbf"
         )
         nu = UniformFloatHyperparameter(
-            name = "nu",
-            lower = 0.01,
-            upper = 1.0,
-            default_value = 0.5
+            name="nu",
+            lower=0.01,
+            upper=1.0,
+            default_value=0.5
         )
         degree = UniformIntegerHyperparameter(
-            name = "degree",
-            lower = 2,
-            upper = 5,
-            default_value = 3
+            name="degree",
+            lower=2,
+            upper=5,
+            default_value=3
         )
         coef0 = UniformFloatHyperparameter(
-            name = 'coef0',
-            lower = 1e-2,
-            upper = 1e2,
-            default_value = 1,
-            log = True
+            name='coef0',
+            lower=1e-2,
+            upper=1e2,
+            default_value=1,
+            log=True
         )
         gamma = UniformFloatHyperparameter(
-            name= "gamma",
-            lower = 3.0517578125e-05,
-            upper = 8,
-            default_value = 0.1,
-            log = True
+            name="gamma",
+            lower=3.0517578125e-05,
+            upper=8,
+            default_value=0.1,
+            log=True
         )
         shrinking = CategoricalHyperparameter(
-            name = "shrinking",
-            choices = [True, False],
-            default_value = True
+            name="shrinking",
+            choices=[True, False],
+            default_value=True
         )
         tol = UniformFloatHyperparameter(
-            name = "tol",
-            lower = 1e-5,
-            upper = 1e-1,
-            default_value = 1e-3,
-            log = True
+            name="tol",
+            lower=1e-5,
+            upper=1e-1,
+            default_value=1e-3,
+            log=True
         )
         contamination = UniformFloatHyperparameter(
-            name = "contamination", 
-            lower = 0.0,
-            upper = 0.5,
-            default_value = 0.1
+            name="contamination",
+            lower=0.0,
+            upper=0.5,
+            default_value=0.1
         )
-        cs.add_hyperparameters([nu, kernel, degree, coef0, gamma, shrinking, tol, 
+        cs.add_hyperparameters([nu, kernel, degree, coef0, gamma, shrinking, tol,
                                 contamination])
         degree_depends_on_poly = EqualsCondition(degree, kernel, "poly")
         coef0_condition = InCondition(coef0, kernel, ["poly", "sigmoid"])

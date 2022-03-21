@@ -4,6 +4,7 @@ from ConfigSpace.hyperparameters import UniformFloatHyperparameter
 from autosklearn.pipeline.components.base import AutoSklearnClassificationAlgorithm
 from autosklearn.pipeline.constants import DENSE, SPARSE, UNSIGNED_DATA, PREDICTIONS
 
+
 class ECODClassifier(AutoSklearnClassificationAlgorithm):
 
     def __init__(self, contamination, random_state=None):
@@ -15,7 +16,7 @@ class ECODClassifier(AutoSklearnClassificationAlgorithm):
         from pyod.models.ecod import ECOD
 
         self.estimator = ECOD(
-            contamination = self.contamination
+            contamination=self.contamination
         )
         self.estimator.fit(X, Y)
         return self
@@ -55,11 +56,11 @@ class ECODClassifier(AutoSklearnClassificationAlgorithm):
         cs = ConfigurationSpace()
 
         contamination = UniformFloatHyperparameter(
-            name = "contamination",
-            lower = 0.01,
-            upper = 0.5,
-            q = 0.01,
-            default_value = 0.1
+            name="contamination",
+            lower=0.01,
+            upper=0.5,
+            q=0.01,
+            default_value=0.1
         )
         cs.add_hyperparameters([contamination])
 

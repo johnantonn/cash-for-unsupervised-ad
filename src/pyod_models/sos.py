@@ -4,6 +4,7 @@ from ConfigSpace.hyperparameters import UniformFloatHyperparameter
 from autosklearn.pipeline.components.base import AutoSklearnClassificationAlgorithm
 from autosklearn.pipeline.constants import DENSE, SPARSE, UNSIGNED_DATA, PREDICTIONS
 
+
 class SOSClassifier(AutoSklearnClassificationAlgorithm):
 
     def __init__(self, contamination, perplexity, eps, random_state=None):
@@ -17,9 +18,9 @@ class SOSClassifier(AutoSklearnClassificationAlgorithm):
         from pyod.models.sos import SOS
 
         self.estimator = SOS(
-            contamination = self.contamination,
-            perplexity = self.perplexity,
-            eps = self.eps
+            contamination=self.contamination,
+            perplexity=self.perplexity,
+            eps=self.eps
         )
         self.estimator.fit(X, Y)
         return self
@@ -59,27 +60,26 @@ class SOSClassifier(AutoSklearnClassificationAlgorithm):
         cs = ConfigurationSpace()
 
         contamination = UniformFloatHyperparameter(
-            name = "contamination", 
-            lower = 0.01,
-            upper = 0.5,
-            q = 0.01,
-            default_value = 0.1
+            name="contamination",
+            lower=0.01,
+            upper=0.5,
+            q=0.01,
+            default_value=0.1
         )
         perplexity = UniformFloatHyperparameter(
-            name = "perplexity",
-            lower = 1.0,
-            upper = 100.0,
-            q = 0.5,
-            default_value = 4.5
+            name="perplexity",
+            lower=1.0,
+            upper=100.0,
+            q=0.5,
+            default_value=4.5
         )
         eps = UniformFloatHyperparameter(
-            name = "eps",
-            lower = 1e-7,
-            upper = 1e-2,
-            default_value = 1e-5,
-            log = True
+            name="eps",
+            lower=1e-7,
+            upper=1e-2,
+            default_value=1e-5,
+            log=True
         )
         cs.add_hyperparameters([contamination, perplexity, eps])
 
-        
         return cs

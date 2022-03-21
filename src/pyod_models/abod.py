@@ -4,6 +4,7 @@ from ConfigSpace.hyperparameters import UniformIntegerHyperparameter, \
 from autosklearn.pipeline.components.base import AutoSklearnClassificationAlgorithm
 from autosklearn.pipeline.constants import DENSE, SPARSE, UNSIGNED_DATA, PREDICTIONS
 
+
 class ABODClassifier(AutoSklearnClassificationAlgorithm):
 
     def __init__(self, contamination, n_neighbors, method, random_state=None):
@@ -17,9 +18,9 @@ class ABODClassifier(AutoSklearnClassificationAlgorithm):
         from pyod.models.abod import ABOD
 
         self.estimator = ABOD(
-            contamination = self.contamination,
-            n_neighbors = self.n_neighbors,
-            method = self.method
+            contamination=self.contamination,
+            n_neighbors=self.n_neighbors,
+            method=self.method
         )
         self.estimator.fit(X, Y)
         return self
@@ -59,22 +60,22 @@ class ABODClassifier(AutoSklearnClassificationAlgorithm):
         cs = ConfigurationSpace()
 
         contamination = UniformFloatHyperparameter(
-            name = "contamination",
-            lower = 0.01,
-            upper = 0.5,
-            q = 0.01,
-            default_value = 0.1
+            name="contamination",
+            lower=0.01,
+            upper=0.5,
+            q=0.01,
+            default_value=0.1
         )
         n_neighbors = UniformIntegerHyperparameter(
-            name = "n_neighbors",
-            lower = 1,
-            upper = 100, # ad-hoc
-            default_value = 10
+            name="n_neighbors",
+            lower=1,
+            upper=100,  # ad-hoc
+            default_value=10
         )
         method = CategoricalHyperparameter(
-            name = "method",
-            choices = ["fast", "default"],
-            default_value = "fast"
+            name="method",
+            choices=["fast", "default"],
+            default_value="fast"
         )
         cs.add_hyperparameters([contamination, n_neighbors, method])
 

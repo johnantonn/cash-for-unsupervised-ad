@@ -5,9 +5,10 @@ from ConfigSpace.hyperparameters import UniformIntegerHyperparameter, \
 from autosklearn.pipeline.components.base import AutoSklearnClassificationAlgorithm
 from autosklearn.pipeline.constants import DENSE, SPARSE, UNSIGNED_DATA, PREDICTIONS
 
+
 class SODClassifier(AutoSklearnClassificationAlgorithm):
 
-    def __init__(self, n_neighbors, alpha, contamination, 
+    def __init__(self, n_neighbors, alpha, contamination,
                  random_state=None):
         self.n_neighbors = n_neighbors
         self.alpha = alpha
@@ -19,9 +20,9 @@ class SODClassifier(AutoSklearnClassificationAlgorithm):
         from pyod.models.sod import SOD
 
         self.estimator = SOD(
-            n_neighbors = self.n_neighbors,
-            alpha = self.alpha,
-            contamination = self.contamination
+            n_neighbors=self.n_neighbors,
+            alpha=self.alpha,
+            contamination=self.contamination
         )
         self.estimator.fit(X, Y)
         return self
@@ -61,24 +62,24 @@ class SODClassifier(AutoSklearnClassificationAlgorithm):
         cs = ConfigurationSpace()
 
         n_neighbors = UniformIntegerHyperparameter(
-            name = "n_neighbors",
-            lower = 1,
-            upper = 100, # ad-hoc
-            default_value = 20
+            name="n_neighbors",
+            lower=1,
+            upper=100,  # ad-hoc
+            default_value=20
         )
         alpha = UniformFloatHyperparameter(
-            name = "alpha",
-            lower = 0.01,
-            upper = 1.0,
-            q = 0.01,
-            default_value = 0.8
+            name="alpha",
+            lower=0.01,
+            upper=1.0,
+            q=0.01,
+            default_value=0.8
         )
         contamination = UniformFloatHyperparameter(
-            name = "contamination", 
-            lower = 0.01,
-            upper = 0.5,
-            q = 0.01,
-            default_value = 0.1
+            name="contamination",
+            lower=0.01,
+            upper=0.5,
+            q=0.01,
+            default_value=0.1
         )
         cs.add_hyperparameters([n_neighbors, alpha, contamination])
 

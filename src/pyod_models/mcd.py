@@ -5,6 +5,7 @@ from ConfigSpace.hyperparameters import UniformFloatHyperparameter, \
 from autosklearn.pipeline.components.base import AutoSklearnClassificationAlgorithm
 from autosklearn.pipeline.constants import DENSE, SPARSE, UNSIGNED_DATA, PREDICTIONS
 
+
 class MCDClassifier(AutoSklearnClassificationAlgorithm):
 
     def __init__(self, contamination, assume_centered, support_fraction, random_state=None):
@@ -18,9 +19,9 @@ class MCDClassifier(AutoSklearnClassificationAlgorithm):
         from pyod.models.mcd import MCD
 
         self.estimator = MCD(
-            contamination = self.contamination,
-            assume_centered = self.assume_centered,
-            support_fraction = self.support_fraction
+            contamination=self.contamination,
+            assume_centered=self.assume_centered,
+            support_fraction=self.support_fraction
         )
         self.estimator.fit(X, Y)
         return self
@@ -60,24 +61,25 @@ class MCDClassifier(AutoSklearnClassificationAlgorithm):
         cs = ConfigurationSpace()
 
         contamination = UniformFloatHyperparameter(
-            name = "contamination", 
-            lower = 0.01,
-            upper = 0.5,
-            q = 0.01,
-            default_value = 0.1
+            name="contamination",
+            lower=0.01,
+            upper=0.5,
+            q=0.01,
+            default_value=0.1
         )
         assume_centered = CategoricalHyperparameter(
-            name = "assume_centered", 
-            choices = [True, False],
-            default_value = False
+            name="assume_centered",
+            choices=[True, False],
+            default_value=False
         )
         support_fraction = UniformFloatHyperparameter(
-            name = "support_fraction", 
-            lower = 0.0,
-            upper = 1.0,
-            q = 0.01,
-            default_value = 0.5 # ad-hoc
+            name="support_fraction",
+            lower=0.0,
+            upper=1.0,
+            q=0.01,
+            default_value=0.5  # ad-hoc
         )
-        cs.add_hyperparameters([contamination, assume_centered, support_fraction])
-        
+        cs.add_hyperparameters(
+            [contamination, assume_centered, support_fraction])
+
         return cs

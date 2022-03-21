@@ -5,6 +5,7 @@ from ConfigSpace.hyperparameters import UniformIntegerHyperparameter, \
 from autosklearn.pipeline.components.base import AutoSklearnClassificationAlgorithm
 from autosklearn.pipeline.constants import DENSE, SPARSE, UNSIGNED_DATA, PREDICTIONS
 
+
 class LOCIClassifier(AutoSklearnClassificationAlgorithm):
 
     def __init__(self, contamination, alpha, k, random_state=None):
@@ -18,9 +19,9 @@ class LOCIClassifier(AutoSklearnClassificationAlgorithm):
         from pyod.models.loci import LOCI
 
         self.estimator = LOCI(
-            contamination = self.contamination,
-            alpha = self.alpha,
-            k = self.k
+            contamination=self.contamination,
+            alpha=self.alpha,
+            k=self.k
         )
         self.estimator.fit(X, Y)
         return self
@@ -60,24 +61,24 @@ class LOCIClassifier(AutoSklearnClassificationAlgorithm):
         cs = ConfigurationSpace()
 
         contamination = UniformFloatHyperparameter(
-            name = "contamination",
-            lower = 0.01,
-            upper = 0.5,
-            q = 0.01,
-            default_value = 0.1
+            name="contamination",
+            lower=0.01,
+            upper=0.5,
+            q=0.01,
+            default_value=0.1
         )
         alpha = UniformFloatHyperparameter(
-            name = "alpha",
-            lower = 0.0,
-            upper = 1.0,
-            q = 0.01,
-            default_value = 0.5
+            name="alpha",
+            lower=0.0,
+            upper=1.0,
+            q=0.01,
+            default_value=0.5
         )
         k = UniformIntegerHyperparameter(
-            name = "k",
-            lower = 1,
-            upper = 100, # ad-hoc
-            default_value = 3
+            name="k",
+            lower=1,
+            upper=100,  # ad-hoc
+            default_value=3
         )
         cs.add_hyperparameters([contamination, alpha, k])
 

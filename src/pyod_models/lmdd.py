@@ -5,6 +5,7 @@ from ConfigSpace.hyperparameters import UniformIntegerHyperparameter, \
 from autosklearn.pipeline.components.base import AutoSklearnClassificationAlgorithm
 from autosklearn.pipeline.constants import DENSE, SPARSE, UNSIGNED_DATA, PREDICTIONS
 
+
 class LMDDClassifier(AutoSklearnClassificationAlgorithm):
 
     def __init__(self, contamination, n_iter, dis_measure, random_state=None):
@@ -18,9 +19,9 @@ class LMDDClassifier(AutoSklearnClassificationAlgorithm):
         from pyod.models.lmdd import LMDD
 
         self.estimator = LMDD(
-            contamination = self.contamination,
-            n_iter = self.n_iter,
-            dis_measure = self.dis_measure, 
+            contamination=self.contamination,
+            n_iter=self.n_iter,
+            dis_measure=self.dis_measure,
         )
         self.estimator.fit(X, Y)
         return self
@@ -60,25 +61,25 @@ class LMDDClassifier(AutoSklearnClassificationAlgorithm):
         cs = ConfigurationSpace()
 
         contamination = UniformFloatHyperparameter(
-            name = "contamination",
-            lower = 0.01,
-            upper = 0.5,
-            q = 0.01,
-            default_value = 0.1
+            name="contamination",
+            lower=0.01,
+            upper=0.5,
+            q=0.01,
+            default_value=0.1
         )
         n_iter = UniformIntegerHyperparameter(
-            name = "n_iter",
-            lower = 5,
-            upper = 200, # ad-hoc
-            q = 5,
-            default_value = 50
+            name="n_iter",
+            lower=5,
+            upper=200,  # ad-hoc
+            q=5,
+            default_value=50
         )
         dis_measure = CategoricalHyperparameter(
-            name = "dis_measure",
-            choices = ["aad", "var", "iqr"],
-            default_value = "aad"
+            name="dis_measure",
+            choices=["aad", "var", "iqr"],
+            default_value="aad"
         )
-          
+
         cs.add_hyperparameters([contamination, n_iter, dis_measure])
 
         return cs
