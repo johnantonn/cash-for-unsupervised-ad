@@ -62,9 +62,9 @@ class MCDClassifier(AutoSklearnClassificationAlgorithm):
 
         contamination = UniformFloatHyperparameter(
             name="contamination",
-            lower=0.01,
+            lower=0.05,
             upper=0.5,
-            q=0.01,
+            q=0.05,
             default_value=0.1
         )
         assume_centered = CategoricalHyperparameter(
@@ -76,7 +76,7 @@ class MCDClassifier(AutoSklearnClassificationAlgorithm):
             name="support_fraction",
             lower=0.0,
             upper=1.0,
-            q=0.01,
+            q=0.05,
             default_value=0.5  # ad-hoc
         )
         cs.add_hyperparameters(

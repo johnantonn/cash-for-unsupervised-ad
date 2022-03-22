@@ -76,7 +76,7 @@ class IForestClassifier(AutoSklearnClassificationAlgorithm):
             name="max_samples",
             lower=0.2,  # ad-hoc
             upper=1.0,
-            q=0.2,
+            q=0.05,
             default_value=1.0
         )
         max_features = Constant(
@@ -85,9 +85,9 @@ class IForestClassifier(AutoSklearnClassificationAlgorithm):
         )
         contamination = UniformFloatHyperparameter(
             name="contamination",
-            lower=0.01,
+            lower=0.05,
             upper=0.5,
-            q=0.01,
+            q=0.05,
             default_value=0.1
         )
         bootstrap = Constant(

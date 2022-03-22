@@ -73,9 +73,9 @@ class PCAClassifier(AutoSklearnClassificationAlgorithm):
         )
         contamination = UniformFloatHyperparameter(
             name="contamination",
-            lower=0.01,
+            lower=0.05,
             upper=0.5,
-            q=0.01,
+            q=0.05,
             default_value=0.1
         )
         whiten = CategoricalHyperparameter(

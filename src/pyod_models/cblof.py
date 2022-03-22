@@ -74,23 +74,24 @@ class CBLOFClassifier(AutoSklearnClassificationAlgorithm):
         )
         contamination = UniformFloatHyperparameter(
             name="contamination",
-            lower=0.01,
+            lower=0.05,
             upper=0.5,
-            q=0.01,
+            q=0.05,
             default_value=0.1
         )
         alpha = UniformFloatHyperparameter(
             name="alpha",
             lower=0.5,
             upper=1.0,
-            q=0.1,
+            q=0.05,
             default_value=0.9
         )
         beta = UniformIntegerHyperparameter(
             name="beta",
             lower=2,
-            upper=10,  # ad-hoc
-            default_value=5
+            upper=20,  # ad-hoc
+            q=2,
+            default_value=6
         )
         use_weights = Constant(
             name="use_weights",

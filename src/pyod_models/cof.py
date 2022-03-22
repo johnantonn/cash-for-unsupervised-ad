@@ -1,6 +1,6 @@
 from ConfigSpace.configuration_space import ConfigurationSpace
 from ConfigSpace.hyperparameters import UniformIntegerHyperparameter, \
-    UniformFloatHyperparameter, CategoricalHyperparameter
+    UniformFloatHyperparameter, Constant
 
 from autosklearn.pipeline.components.base import AutoSklearnClassificationAlgorithm
 from autosklearn.pipeline.constants import DENSE, SPARSE, UNSIGNED_DATA, PREDICTIONS
@@ -62,9 +62,9 @@ class COFClassifier(AutoSklearnClassificationAlgorithm):
 
         contamination = UniformFloatHyperparameter(
             name="contamination",
-            lower=0.01,
+            lower=0.05,
             upper=0.5,
-            q=0.01,
+            q=0.05,
             default_value=0.1
         )
         n_neighbors = UniformIntegerHyperparameter(
@@ -73,10 +73,9 @@ class COFClassifier(AutoSklearnClassificationAlgorithm):
             upper=100,  # ad-hoc
             default_value=20
         )
-        method = CategoricalHyperparameter(
+        method = Constant(
             name="method",
-            choices=["fast", "memory"],
-            default_value="fast"
+            value="fast"
         )
         cs.add_hyperparameters([contamination, n_neighbors, method])
 

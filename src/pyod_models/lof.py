@@ -63,7 +63,7 @@ class LOFClassifier(AutoSklearnClassificationAlgorithm):
         n_neighbors = UniformIntegerHyperparameter(
             name="n_neighbors",
             lower=1,
-            upper=100,  # ad-hoc
+            upper=200,  # ad-hoc
             default_value=20
         )
         # order of minkowski distance metric (used by default)
@@ -73,9 +73,9 @@ class LOFClassifier(AutoSklearnClassificationAlgorithm):
         )
         contamination = UniformFloatHyperparameter(
             name="contamination",
-            lower=0.01,
+            lower=0.05,
             upper=0.5,
-            q=0.01,
+            q=0.05,
             default_value=0.1
         )
         cs.add_hyperparameters([n_neighbors, p, contamination])

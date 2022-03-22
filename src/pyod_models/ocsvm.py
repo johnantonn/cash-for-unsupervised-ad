@@ -117,8 +117,9 @@ class OCSVMClassifier(AutoSklearnClassificationAlgorithm):
         )
         contamination = UniformFloatHyperparameter(
             name="contamination",
-            lower=0.0,
+            lower=0.05,
             upper=0.5,
+            q=0.05,
             default_value=0.1
         )
         cs.add_hyperparameters([nu, kernel, degree, coef0, gamma, shrinking, tol,

@@ -65,7 +65,7 @@ class KNNClassifier(AutoSklearnClassificationAlgorithm):
         n_neighbors = UniformIntegerHyperparameter(
             name="n_neighbors",
             lower=1,
-            upper=100,  # ad-hoc
+            upper=200,  # ad-hoc
             default_value=5
         )
         method = Constant(
@@ -79,9 +79,9 @@ class KNNClassifier(AutoSklearnClassificationAlgorithm):
         )
         contamination = UniformFloatHyperparameter(
             name="contamination",
-            lower=0.01,
+            lower=0.05,
             upper=0.5,
-            q=0.01,
+            q=0.05,
             default_value=0.1
         )
         cs.add_hyperparameters([n_neighbors, method, p, contamination])
