@@ -1,6 +1,7 @@
 import os
 import time
-from search import RandomSearch, SMACSearch, RandomProportionalSearch
+from search import RandomSearch, SMACSearch, RandomProportionalSearch, \
+    BOSHSearch, BOHBSearch
 from utils import import_dataset, add_pyod_models_to_pipeline, \
     get_search_space_size, plot_performance
 
@@ -103,6 +104,43 @@ if __name__ == "__main__":
             smac.print_summary()
             smac.print_rankings()
             smac.save_results()
+
+        # Successive Halving (stratified)
+        # only stratified applicable
+        d_name = name + '_bosh'
+        bosh = BOSHSearch(
+            d_name=d_name,
+            df=df,
+            classifiers=classifiers,
+            validation_strategy='stratified',
+            max_samples=max_samples,
+            total_budget=total_budget,
+            per_run_budget=per_run_budget,
+            output_dir=out_dir
+        )
+        bosh.run()
+        bosh.plot_scores()
+        bosh.print_summary()
+        bosh.print_rankings()
+        bosh.save_results()
+
+        # Hyberband (stratified)
+        d_name = name + '_bohb'
+        bohb = BOHBSearch(
+            d_name=d_name,
+            df=df,
+            classifiers=classifiers,
+            validation_strategy='stratified',
+            max_samples=max_samples,
+            total_budget=total_budget,
+            per_run_budget=per_run_budget,
+            output_dir=out_dir
+        )
+        bohb.run()
+        bohb.plot_scores()
+        bohb.print_summary()
+        bohb.print_rankings()
+        bohb.save_results()
 
     # Plot multi-line performance graph
     plot_performance(out_dir, total_budget)
