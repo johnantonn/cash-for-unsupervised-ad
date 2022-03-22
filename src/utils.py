@@ -359,6 +359,11 @@ def plot_performance(out_dirname, total_budget):
             ax2.set_xlabel('seconds')
             ax2.set_title('balanced-test')
             ax2.grid()
+            for ax in [ax1, ax2]:
+                handles, labels = ax.get_legend_handles_labels()
+                labels, handles = zip(
+                    *sorted(zip(labels, handles), key=lambda t: t[0]))
+                ax.legend(handles, labels, loc='lower right')
         elif 'stratified' in file:
             ax3.plot(x, yval, label=file.split('.')[0])
             ax3.set_ylim([0.5, 1.])
@@ -371,15 +376,10 @@ def plot_performance(out_dirname, total_budget):
             ax4.set_xlabel('seconds')
             ax4.set_title('stratified-test')
             ax4.grid()
-    ax1.legend(loc='lower right')
-    ax2.legend(loc='lower right')
-    ax3.legend(loc='lower right')
-    ax4.legend(loc='lower right')
-    # sort both labels and handles by labels
-    for ax in [ax1, ax2, ax3, ax4]:
-        handles, labels = ax.get_legend_handles_labels()
-        labels, handles = zip(
-            *sorted(zip(labels, handles), key=lambda t: t[0]))
-        ax.legend(handles, labels)
+            for ax in [ax3, ax4]:
+                handles, labels = ax.get_legend_handles_labels()
+                labels, handles = zip(
+                    *sorted(zip(labels, handles), key=lambda t: t[0]))
+                ax.legend(handles, labels, loc='lower right')
     fig_title = 'all_' + str(total_budget) + '.png'
     plt.savefig(os.path.join(path, fig_title))
