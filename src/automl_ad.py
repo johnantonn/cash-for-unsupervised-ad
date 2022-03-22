@@ -1,6 +1,6 @@
 import os
 import time
-from search import SMACSearch, RandomSearch
+from search import RandomSearch, SMACSearch, RandomProportionalSearch
 from utils import import_dataset, add_pyod_models_to_pipeline, \
     get_search_space_size, plot_performance
 
@@ -31,16 +31,12 @@ if __name__ == "__main__":
         'LOFClassifier',
     ]
 
-    # Hyperparameter search space size
-    sp_size = get_search_space_size(classifiers)
-    print('Estimated hyperparameter search space size:', sp_size)
-
     # Budget estimation
     # TODO
 
     # Budget constraints
     # TODO: should be based estimated budget
-    total_budget = 600
+    total_budget = 300
     per_run_budget = 30
 
     # Output directory (based on timestamp)
@@ -56,6 +52,22 @@ if __name__ == "__main__":
         # Resampling strategy
         for validation_strategy in ['stratified', 'balanced']:
 
+            # Random proportional search
+            d_name = name + '_prop'
+            prop = RandomProportionalSearch(
+                d_name=d_name,
+                df=df,
+                classifiers=classifiers,
+                validation_strategy=validation_strategy,
+                max_samples=max_samples,
+                total_budget=total_budget,
+                per_run_budget=per_run_budget,
+                output_dir=out_dir
+            )
+            prop.run()
+            prop.plot_scores()
+            prop.save_results()
+
             # Random search
             d_name = name + '_random'
             random = RandomSearch(
@@ -66,16 +78,13 @@ if __name__ == "__main__":
                 max_samples=max_samples,
                 total_budget=total_budget,
                 per_run_budget=per_run_budget,
-                out_dir=out_dir
+                output_dir=out_dir
             )
             random.run()
             random.plot_scores()
             random.print_summary()
             random.print_rankings()
             random.save_results()
-
-            # Equally distributed budget search
-            # TODO
 
             # SMAC search
             d_name = name + '_smac'
@@ -87,7 +96,7 @@ if __name__ == "__main__":
                 max_samples=max_samples,
                 total_budget=total_budget,
                 per_run_budget=per_run_budget,
-                out_dir=out_dir
+                output_dir=out_dir
             )
             smac.run()
             smac.plot_scores()

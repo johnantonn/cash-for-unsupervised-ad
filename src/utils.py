@@ -251,7 +251,6 @@ def get_search_space_size(clf_list):
     size = 0
     for clf in clf_list:
         clf_size = get_search_space(clf).estimate_size()
-        print(clf, clf_size)
         size += clf_size
     return size
 
