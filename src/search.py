@@ -254,8 +254,21 @@ class RandomProportionalSearch(Search):
         # concatenate and save results
         self.cv_results = pd.concat(
             cv_results_list, axis=0, ignore_index=True)
-        self.performance_over_time = pd.concat(
+        perf_df = pd.concat(
             performance_over_time_list, axis=0, ignore_index=True)
+        # transform to monotonically increasing
+        self.performance_over_time = self.transform_monotonic(
+            perf_df, ['single_best_optimization_score', 'single_best_test_score'])
+
+    def transform_monotonic(self, df, cols):
+        for col in cols:
+            for index, row in df.iterrows():
+                if index > 0:
+                    cur = df.at[index, col]
+                    prev = df.at[index-1, col]
+                    if cur < prev:
+                        df.at[index, col] = df.at[index-1, col]
+        return df
 
 
 class BOSHSearch(Search):

@@ -3,7 +3,7 @@ import time
 from search import RandomSearch, SMACSearch, RandomProportionalSearch, \
     BOSHSearch, BOHBSearch
 from utils import import_dataset, add_pyod_models_to_pipeline, \
-    get_search_space_size, plot_performance
+    plot_performance
 
 
 if __name__ == "__main__":
@@ -37,7 +37,7 @@ if __name__ == "__main__":
 
     # Budget constraints
     # TODO: should be based estimated budget
-    total_budget = 300
+    total_budget = 600
     per_run_budget = 30
 
     # Output directory (based on timestamp)
