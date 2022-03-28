@@ -10,9 +10,8 @@ from autosklearn.pipeline.constants import SPARSE, DENSE, UNSIGNED_DATA, INPUT
 from autosklearn.pipeline.components.base import AutoSklearnPreprocessingAlgorithm
 from autosklearn.classification import AutoSklearnClassifier
 from autosklearn.metrics import roc_auc, average_precision
-from sklearn.model_selection import train_test_split, PredefinedSplit, \
-    StratifiedShuffleSplit
-from utils import balanced_split, get_search_space_size
+from sklearn.model_selection import PredefinedSplit
+from utils import train_valid_split, get_search_space_size
 
 
 class NoPreprocessing(AutoSklearnPreprocessingAlgorithm):
@@ -51,20 +50,20 @@ class NoPreprocessing(AutoSklearnPreprocessingAlgorithm):
 
 class Search:
 
-    def __init__(self, d_name, df, classifiers, max_samples, validation_strategy, total_budget,
+    def __init__(self, dataset_name, classifiers, validation_strategy, validation_size, total_budget,
                  per_run_budget, output_dir, random_state):
-        self.d_name = d_name  # dataset name
-        self.df = df  # dataframe
+        self.dataset_name = dataset_name  # dataset name
+        self.dataset_dir = os.path.join(os.path.dirname(
+            __file__), 'data/processed/' + self.dataset_name + '/iter1')
         self.classifiers = classifiers  # PyOD algorithms to use
         self.search_space_size = get_search_space_size(
             classifiers)  # size of the search
-        self.max_samples = max_samples  # max samples
         self.validation_strategy = validation_strategy  # split strategy
+        self.validation_size = validation_size  # validation set size
         self.total_budget = total_budget  # total budget in seconds
         self.per_run_budget = per_run_budget  # per run budget in seconds
         self.random_state = random_state  # random state for reproducibility
-        self.resampling_strategy = StratifiedShuffleSplit(
-            n_splits=5, test_size=0.3)  # resampling strategy for optimization
+        self.resampling_strategy = None  # resampling strategy
         self.automl = None  # autosklearn classifier
         self.cv_results = None  # as DataFrame
         self.performance_over_time = None  # as DataFrame
@@ -92,35 +91,29 @@ class Search:
         )
 
     def run(self):
-        print('Running search for {}, strategy: {}'.format(
-            self.d_name, self.validation_strategy))
-        # Subsample if too large
-        if(len(self.df) > self.max_samples):
-            self.df = self.df.sample(n=self.max_samples)
-        # Extract X, y
-        X = self.df.iloc[:, :-1]
-        y = self.df['outlier']
-        # Split to train/test
-        X_train, X_test, y_train, y_test = train_test_split(
-            X, y, test_size=0.3, stratify=y, random_state=self.random_state)
+        print('Running {} search for {}, strategy: ({}, {})'.format(
+            self.search_type,
+            self.dataset_name,
+            self.validation_strategy,
+            self.validation_size
+        ))
+        # Import train/test data
+        X_train = pd.read_csv(os.path.join(self.dataset_dir, 'X_train.csv'))
+        y_train = pd.read_csv(os.path.join(self.dataset_dir, 'y_train.csv'))
+        X_test = pd.read_csv(os.path.join(self.dataset_dir, 'X_test.csv'))
+        y_test = pd.read_csv(os.path.join(self.dataset_dir, 'y_test.csv'))
         # Resampling strategy
-        if self.validation_strategy == 'stratified':
-            self.resampling_strategy = StratifiedShuffleSplit(
-                n_splits=5, test_size=0.3)
-        elif self.validation_strategy == 'balanced':  # based on y_train
-            selected_indices = balanced_split(y_train)
-            self.resampling_strategy = PredefinedSplit(
-                test_fold=selected_indices)
-        else:
-            raise ValueError('Invalid value `{}` for argument `resampling_strategy`'.format(
-                self.validation_strategy))
+        train_valid_indices = train_valid_split(
+            y_train, self.validation_strategy, vsize=self.validation_size)
+        self.resampling_strategy = PredefinedSplit(
+            test_fold=train_valid_indices)
         # Add NoPreprocessing component to auto-sklearn
         data_preprocessing.add_preprocessor(
             NoPreprocessing)
         # Build automl classifier
         self.automl = self.build_automl()
         self.automl.fit(X_train, y_train, X_test,
-                        y_test, dataset_name=self.d_name)
+                        y_test, dataset_name=self.dataset_name)
         # Save results
         self.cv_results = pd.DataFrame.from_dict(self.automl.cv_results_)
         self.performance_over_time = self.automl.performance_over_time_
@@ -144,7 +137,12 @@ class Search:
 
     def plot_scores(self):
         # Filename and directory
-        title = '{}_{}'.format(self.d_name, self.validation_strategy)
+        title = '{}_{}_{}_{}'.format(
+            self.dataset_name,
+            self.search_type,
+            self.validation_strategy,
+            self.validation_size
+        )
         plots_dir = os.path.join(self.output_dir, 'plots')
         if not os.path.exists(plots_dir):
             os.makedirs(plots_dir)
@@ -179,7 +177,12 @@ class Search:
 
     def save_results(self):
         # Filename
-        title = '{}_{}'.format(self.d_name, self.validation_strategy)
+        title = '{}_{}_{}_{}'.format(
+            self.dataset_name,
+            self.search_type,
+            self.validation_strategy,
+            self.validation_size
+        )
         cv_results_dir = os.path.join(self.output_dir, 'cv_results')
         if not os.path.exists(cv_results_dir):
             os.makedirs(cv_results_dir)
@@ -196,26 +199,29 @@ class Search:
 
 class SMACSearch(Search):
 
-    def __init__(self, d_name, df, classifiers, validation_strategy, max_samples=5000,
+    def __init__(self, dataset_name, classifiers, validation_strategy, validation_size=200,
                  total_budget=600, per_run_budget=30, output_dir='output', random_state=123):
+        self.search_type = 'smac'
         self.smac_object_callback = None
-        super().__init__(d_name, df, classifiers, max_samples, validation_strategy,
+        super().__init__(dataset_name, classifiers, validation_strategy, validation_size,
                          total_budget, per_run_budget, output_dir, random_state)
 
 
 class RandomSearch(Search):
 
-    def __init__(self, d_name, df, classifiers, validation_strategy, max_samples=5000,
+    def __init__(self, dataset_name, classifiers, validation_strategy, validation_size=200,
                  total_budget=600, per_run_budget=30, output_dir='output', random_state=123):
+        self.search_type = 'random'
         self.smac_object_callback = get_random_search_object_callback
-        super().__init__(d_name, df, classifiers, max_samples, validation_strategy,
+        super().__init__(dataset_name, classifiers, validation_strategy, validation_size,
                          total_budget, per_run_budget, output_dir, random_state)
 
 
-class EqualBudgetSearch(Search):
-    def __init__(self, d_name, df, classifiers, validation_strategy, max_samples=5000,
+class EquallyDistributedBudgetSearch(Search):
+    def __init__(self, dataset_name, classifiers, validation_strategy, validation_size=200,
                  total_budget=600, per_run_budget=30, output_dir='output', random_state=123):
-        super().__init__(d_name, df, classifiers, max_samples, validation_strategy,
+        self.search_type = 'edb'
+        super().__init__(dataset_name, classifiers, validation_strategy, validation_size,
                          total_budget, per_run_budget, output_dir, random_state)
 
     def run(self):
@@ -224,16 +230,13 @@ class EqualBudgetSearch(Search):
         budget = int(self.total_budget / len(self.classifiers))
         # run individual searches
         for clf in self.classifiers:
-            clf_name = clf.split('Classifier')[0].lower()
-            d_name = self.d_name+'_'+clf_name
             print('Budget for {}: {}'.format(clf, budget))
             # define random search object
             rs = RandomSearch(
-                d_name,
-                self.df,
+                self.dataset_name,
                 [clf],
                 self.validation_strategy,
-                self.max_samples,
+                self.validation_size,
                 budget,
                 self.per_run_budget,
                 self.output_dir,
@@ -266,20 +269,22 @@ class EqualBudgetSearch(Search):
 
 
 class BOSHSearch(Search):
-    def __init__(self, d_name, df, classifiers, validation_strategy, max_samples=5000,
+    def __init__(self, dataset_name, classifiers, validation_strategy, validation_size=200,
                  total_budget=600, per_run_budget=30, output_dir='output', random_state=123):
+        self.search_type = 'bosh'
         self.smac_object_callback = get_bosh_object_callback(
             'iterations')  # BOSH callback
-        super().__init__(d_name, df, classifiers, max_samples, validation_strategy,
+        super().__init__(dataset_name, classifiers, validation_size,
                          total_budget, per_run_budget, output_dir, random_state)
 
 
 class BOHBSearch(Search):
-    def __init__(self, d_name, df, classifiers, validation_strategy, max_samples=5000,
+    def __init__(self, dataset_name, classifiers, validation_strategy, validation_size=200,
                  total_budget=600, per_run_budget=30, output_dir='output', random_state=123):
+        self.search_type = 'bohb'
         self.smac_object_callback = get_bohb_object_callback(
             'iterations')  # BOHB callback
-        super().__init__(d_name, df, classifiers, max_samples, validation_strategy,
+        super().__init__(dataset_name, classifiers, validation_strategy, validation_size,
                          total_budget, per_run_budget, output_dir, random_state)
 
 
