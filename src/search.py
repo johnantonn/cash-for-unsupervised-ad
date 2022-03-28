@@ -1,6 +1,5 @@
 import os
 import pandas as pd
-from math import floor
 from matplotlib import pyplot as plt
 from datetime import timedelta as td
 from smac.facade.roar_facade import ROAR
@@ -13,7 +12,7 @@ from autosklearn.classification import AutoSklearnClassifier
 from autosklearn.metrics import roc_auc, average_precision
 from sklearn.model_selection import train_test_split, PredefinedSplit, \
     StratifiedShuffleSplit
-from utils import balanced_split, get_search_space_size, plot_performance
+from utils import balanced_split, get_search_space_size
 
 
 class NoPreprocessing(AutoSklearnPreprocessingAlgorithm):
@@ -213,7 +212,7 @@ class RandomSearch(Search):
                          total_budget, per_run_budget, output_dir, random_state)
 
 
-class RandomProportionalSearch(Search):
+class EqualBudgetSearch(Search):
     def __init__(self, d_name, df, classifiers, validation_strategy, max_samples=5000,
                  total_budget=600, per_run_budget=30, output_dir='output', random_state=123):
         super().__init__(d_name, df, classifiers, max_samples, validation_strategy,
@@ -222,16 +221,11 @@ class RandomProportionalSearch(Search):
     def run(self):
         cv_results_list = []
         performance_over_time_list = []
+        budget = int(self.total_budget / len(self.classifiers))
         # run individual searches
         for clf in self.classifiers:
             clf_name = clf.split('Classifier')[0].lower()
             d_name = self.d_name+'_'+clf_name
-            # calculate budget
-            budget = floor(self.total_budget *
-                           get_search_space_size([clf])/self.search_space_size)
-            # balance budget across classifiers
-            if budget < self.per_run_budget:
-                budget = self.per_run_budget
             print('Budget for {}: {}'.format(clf, budget))
             # define random search object
             rs = RandomSearch(

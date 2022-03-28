@@ -1,6 +1,6 @@
 import os
 import time
-from search import RandomSearch, SMACSearch, RandomProportionalSearch, \
+from search import RandomSearch, SMACSearch, EqualBudgetSearch, \
     BOSHSearch, BOHBSearch
 from utils import import_dataset, add_pyod_models_to_pipeline, \
     plot_performance
@@ -37,7 +37,7 @@ if __name__ == "__main__":
 
     # Budget constraints
     # TODO: should be based estimated budget
-    total_budget = 600
+    total_budget = 300
     per_run_budget = 30
 
     # Output directory (based on timestamp)
@@ -54,8 +54,8 @@ if __name__ == "__main__":
         for validation_strategy in ['stratified', 'balanced']:
 
             # Random proportional search
-            d_name = name + '_prop'
-            prop = RandomProportionalSearch(
+            d_name = name + '_equal'
+            equal = EqualBudgetSearch(
                 d_name=d_name,
                 df=df,
                 classifiers=classifiers,
@@ -65,9 +65,9 @@ if __name__ == "__main__":
                 per_run_budget=per_run_budget,
                 output_dir=out_dir
             )
-            prop.run()
-            prop.plot_scores()
-            prop.save_results()
+            equal.run()
+            equal.plot_scores()
+            equal.save_results()
 
             # Random search
             d_name = name + '_random'
