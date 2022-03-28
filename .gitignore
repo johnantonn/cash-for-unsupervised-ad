@@ -2,7 +2,7 @@
 .vscode
 
 # Input files
-data/*
+**/data
 
 # Output
 **/output
