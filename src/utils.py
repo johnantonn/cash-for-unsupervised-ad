@@ -1,4 +1,5 @@
 import os
+import numpy as np
 import pandas as pd
 from scipy.io import arff
 from matplotlib import pyplot as plt
@@ -7,7 +8,7 @@ from autosklearn.pipeline.components.classification import add_classifier
 
 
 def import_dataset(filepath):
-    """ 
+    """
     Function that reads a arff-formatted dataset
     and returns a dataframe.
 
@@ -34,7 +35,7 @@ def import_dataset(filepath):
 
 
 def add_pyod_models_to_pipeline():
-    """ 
+    """
     Function that imports the external PyOD models
     and adds them to Aut-Sklearn.
 
@@ -238,7 +239,7 @@ def get_search_space(clf_name):
 
 def get_search_space_size(clf_list):
     """
-    Function that calculates and returns the estimated size 
+    Function that calculates and returns the estimated size
     of the hyperparameter search space defined by the provided
     list of algorithms.
 
@@ -255,54 +256,64 @@ def get_search_space_size(clf_list):
     return size
 
 
-def balanced_split(y, print_flag=False):
-    """ 
-    Function that takes the target attribute values, y 
-    and returns indices for training and validation, with
-    equal ratio of inliers/outliers for the validation set.
+def train_valid_split(labels, valid_method='stratified', vsize=100):
+    """
+    Function that takes a list of `labels` and returns
+    indices for training and validation sets according
+    to the provided `valid_method` parameter.
 
     Args:
         y (list or np.array): The target attribute labels y
+        valid_method (string): 'stratified' or 'balanced'
+        print_flag (boolean): whether to print split stats
 
     Returns:
-        selected_indices (list): A list indicating whether the 
-        corresponding index will be part of the training set (0) 
+        train_valid_indices (list): A list indicating whether the
+        corresponding index will be part of the training set (0)
         or the validation set (1).
     """
+
     # Initialize
-    selected_indices = []  # initially all in training
-    norm_train = 0
-    norm_test = 0
-    out_train = 0
-    out_test = 0
-    for v in y:
-        if v == 1:  # outlier
-            if out_train > 0:  # one will have to go to train
-                selected_indices.append(1)  # test
-                out_test += 1
-            else:
-                selected_indices.append(-1)  # training
-                out_train += 1
-        else:  # normal
-            if out_test > norm_test:
-                selected_indices.append(1)  # test
-                norm_test += 1
-            else:
-                selected_indices.append(-1)  # training
-                norm_train += 1
-    # Prints
-    if print_flag:
-        print('Number of total samples to split:', len(y))
-        print('Number of outliers in training:', out_train)
-        print('Number of outliers in test:', out_test)
-        print('Number of normal points in training:', norm_train)
-        print('Number of normal points in test:', norm_test)
+    train_valid_indices = -np.ones(len(labels), dtype=int)  # all in training
+    labels_0 = np.where(labels == 0)[0]  # normal points
+    labels_1 = np.where(labels == 1)[0]  # outliers
+    p_outlier = 0.  # outlier percentage
+
+    if(valid_method == 'stratified'):
+        # Equal to outlier percentage in training set
+        p_outlier = float(len(labels_1)/len(labels))
+    elif(valid_method == 'balanced'):
+        # Equal to 50% no matter what
+        p_outlier = 0.5
+    else:
+        raise ValueError(
+            'The provided value of `valid_method`: {} is not supported!'.format(valid_method))
+
+    # number of outliers in validation set
+    n_outlier = round(p_outlier * vsize)
+    n_normal = vsize - n_outlier  # number of normal points in validation set
+    print('Outlier percentage:', p_outlier)
+    print('Size of the validation set:', vsize)
+    print('Number of outliers:', n_outlier)
+    print('Number of normal points:', n_normal)
+    # indices of outliers for validation
+    outlier_valid_indices = np.random.choice(
+        labels_1, size=n_outlier, replace=False)
+    # indices of normal points for validation
+    normal_valid_indices = np.random.choice(
+        labels_0, size=n_normal, replace=False)
+    # concatenate (should be of length vsize)
+    valid_indices = np.concatenate(
+        (normal_valid_indices, outlier_valid_indices))
+    # construct the output list
+    train_valid_indices[valid_indices] = 1
+
     # Return indices
-    return selected_indices
+    return train_valid_indices
 
 
 def get_metric_result(cv_results):
-    """ 
+    """
     Function that takes as input the cv_results attribute
     of an Auto-Sklearn classifier and returns a number of
     results w.r.t. the defined metrics.
