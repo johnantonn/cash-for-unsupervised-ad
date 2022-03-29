@@ -1,5 +1,6 @@
 import os
 import pandas as pd
+import random
 from matplotlib import pyplot as plt
 from datetime import timedelta as td
 from smac.facade.roar_facade import ROAR
@@ -90,23 +91,35 @@ class Search:
             get_smac_object_callback=self.smac_object_callback
         )
 
+    def print_search_details(self):
+        print('Running Search:')
+        print('  Dataset:\t', self.dataset_name)
+        print('  Type:\t\t', self.search_type)
+        print('  Budget:\t', self.total_budget)
+        print('  Validation:\t ({}, {})'.format(
+            self.validation_strategy, self.validation_size))
+        print('  Classifiers:\t', str(self.classifiers))
+
     def run(self):
-        print('Running {} search for {}, strategy: ({}, {})'.format(
-            self.search_type,
-            self.dataset_name,
-            self.validation_strategy,
-            self.validation_size
-        ))
+        # Print serach details
+        self.print_search_details()
         # Import train/test data
         X_train = pd.read_csv(os.path.join(self.dataset_dir, 'X_train.csv'))
         y_train = pd.read_csv(os.path.join(self.dataset_dir, 'y_train.csv'))
         X_test = pd.read_csv(os.path.join(self.dataset_dir, 'X_test.csv'))
         y_test = pd.read_csv(os.path.join(self.dataset_dir, 'y_test.csv'))
         # Resampling strategy
-        train_valid_indices = train_valid_split(
-            y_train, self.validation_strategy, vsize=self.validation_size)
-        self.resampling_strategy = PredefinedSplit(
-            test_fold=train_valid_indices)
+        try:
+            train_valid_indices = train_valid_split(
+                labels=y_train,
+                validation_strategy=self.validation_strategy,
+                validation_size=self.validation_size
+            )
+            self.resampling_strategy = PredefinedSplit(
+                test_fold=train_valid_indices)
+        except:
+            raise RuntimeError('Failed to create validation set for ({}, {})!'.format(
+                self.validation_strategy, self.validation_size))
         # Add NoPreprocessing component to auto-sklearn
         data_preprocessing.add_preprocessor(
             NoPreprocessing)
@@ -221,16 +234,20 @@ class EquallyDistributedBudgetSearch(Search):
     def __init__(self, dataset_name, classifiers, validation_strategy, validation_size=200,
                  total_budget=600, per_run_budget=30, output_dir='output', random_state=123):
         self.search_type = 'edb'
+        # Random permutation of classifiers
+        random.shuffle(classifiers)
         super().__init__(dataset_name, classifiers, validation_strategy, validation_size,
                          total_budget, per_run_budget, output_dir, random_state)
 
     def run(self):
+        # init
         cv_results_list = []
         performance_over_time_list = []
-        budget = int(self.total_budget / len(self.classifiers))
+        # define budget per classifier
+        budget = max(self.per_run_budget, int(
+            self.total_budget / len(self.classifiers)))
         # run individual searches
         for clf in self.classifiers:
-            print('Budget for {}: {}'.format(clf, budget))
             # define random search object
             rs = RandomSearch(
                 self.dataset_name,
