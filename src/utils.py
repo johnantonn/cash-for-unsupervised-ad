@@ -256,6 +256,55 @@ def get_search_space_size(clf_list):
     return size
 
 
+def get_validation_strategy(h_num=0):
+    """
+    Function that takes the hypothesis number and
+    returns a list of values for the validation 
+    strategy to be used in the search.
+
+    Args:
+        h_num (string): hypothesis number {0, 1, 2, 3}
+
+    Returns:
+        (list): A list of possible validation strategies
+
+    """
+    # Hypothesis condition
+    if h_num in [0, 1, 3]:
+        return ['stratified']
+    elif h_num in [2]:
+        return ['stratified', 'balanced']
+    else:
+        return ValueError('Wrong argument value: {}'.format(h_num))
+
+
+def get_validation_set_size(dataset, h_num=0):
+    """
+    Function that takes the name of the dataset and the
+    hypothesis number and returns a list of values for
+    the validation set size to be used in the search.
+
+    Args:
+        dataset (str): The name of the dataset
+        h_num (string): hypothesis number {0, 1, 2, 3}
+
+    Returns:
+        (list): A list of possible validation set sizes
+
+    """
+    # Hypothesis condition
+    if h_num == 1:
+        return [20, 50, 100, 200, 400]
+    elif h_num in [0, 2, 3]:
+        dataset_dir = os.path.join(os.path.dirname(
+            __file__), 'data/processed/' + dataset + '/iter1')
+        y_train = pd.read_csv(os.path.join(dataset_dir, 'y_train.csv'))
+        size = round(0.3 * y_train.shape[0])
+        return [size]
+    else:
+        return ValueError('Wrong argument value: {}'.format(h_num))
+
+
 def train_valid_split(labels, validation_strategy='stratified',
                       validation_size=200, print_flag=False):
     """

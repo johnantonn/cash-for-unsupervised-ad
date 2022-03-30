@@ -1,7 +1,7 @@
 import time
 from search import RandomSearch, SMACSearch, EquallyDistributedBudgetSearch
-from utils import add_pyod_models_to_pipeline
-
+from utils import add_pyod_models_to_pipeline, get_validation_set_size, \
+    get_validation_strategy
 
 if __name__ == "__main__":
 
@@ -10,9 +10,12 @@ if __name__ == "__main__":
 
     # List of datasets
     datasets = [
-        # 'ALOI',
+        'ALOI',
         'Annthyroid',
-        # 'Cardiotocography'
+        'Cardiotocography',
+        'PageBlocks',
+        'SpamBase',
+        'Waveform'
     ]
 
     # PyOD algorithms to use
@@ -38,9 +41,9 @@ if __name__ == "__main__":
     # Loop over datsets
     for dataset in datasets:
         # Loop over validation strategy
-        for validation_strategy in ['stratified', 'balanced']:
-            # Loop over validation set size
-            for validation_size in [500, 400, 200, 100, 50]:
+        for validation_strategy in get_validation_strategy():
+            # Loop over validation set size values
+            for validation_size in get_validation_set_size(dataset):
 
                 # Equally distributed budget search
                 edb_search = EquallyDistributedBudgetSearch(
