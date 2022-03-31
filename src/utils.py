@@ -278,7 +278,7 @@ def get_validation_strategy(h_num=0):
         return ValueError('Wrong argument value: {}'.format(h_num))
 
 
-def get_validation_set_size(dataset, h_num=0):
+def get_validation_set_size(dataset, iter=1, h_num=0):
     """
     Function that takes the name of the dataset and the
     hypothesis number and returns a list of values for
@@ -297,7 +297,7 @@ def get_validation_set_size(dataset, h_num=0):
         return [20, 50, 100, 200, 400]
     elif h_num in [0, 2, 3]:
         dataset_dir = os.path.join(os.path.dirname(
-            __file__), 'data/processed/' + dataset + '/iter1')
+            __file__), 'data/processed/' + dataset + '/iter'+str(iter))
         y_train = pd.read_csv(os.path.join(dataset_dir, 'y_train.csv'))
         size = round(0.3 * y_train.shape[0])
         return [size]

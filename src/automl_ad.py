@@ -10,12 +10,12 @@ if __name__ == "__main__":
 
     # List of datasets
     datasets = [
-        'ALOI',
-        'Annthyroid',
+        # 'ALOI',
+        # 'Annthyroid',
         'Cardiotocography',
-        'PageBlocks',
-        'SpamBase',
-        'Waveform'
+        # 'PageBlocks',
+        # 'SpamBase',
+        # 'Waveform'
     ]
 
     # PyOD algorithms to use
@@ -32,8 +32,11 @@ if __name__ == "__main__":
 
     # Budget constraints
     # TODO: should be based estimated budget
-    total_budget = 300
+    total_budget = 150
     per_run_budget = 30
+
+    # Dataset iteration number
+    iter = 3
 
     # Current timestamp string
     timestamp = time.strftime("%Y%m%d_%H%M%S")
@@ -43,11 +46,12 @@ if __name__ == "__main__":
         # Loop over validation strategy
         for validation_strategy in get_validation_strategy():
             # Loop over validation set size values
-            for validation_size in get_validation_set_size(dataset):
+            for validation_size in get_validation_set_size(dataset, iter):
 
                 # Equally distributed budget search
                 edb_search = EquallyDistributedBudgetSearch(
                     dataset_name=dataset,
+                    iter=iter,
                     classifiers=classifiers,
                     validation_strategy=validation_strategy,
                     validation_size=validation_size,
@@ -66,6 +70,7 @@ if __name__ == "__main__":
                 # Random search
                 random_search = RandomSearch(
                     dataset_name=dataset,
+                    iter=iter,
                     classifiers=classifiers,
                     validation_strategy=validation_strategy,
                     total_budget=total_budget,
@@ -86,6 +91,7 @@ if __name__ == "__main__":
                 # SMAC search
                 smac_search = SMACSearch(
                     dataset_name=dataset,
+                    iter=iter,
                     classifiers=classifiers,
                     validation_strategy=validation_strategy,
                     validation_size=validation_size,

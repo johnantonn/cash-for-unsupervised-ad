@@ -51,11 +51,12 @@ class NoPreprocessing(AutoSklearnPreprocessingAlgorithm):
 
 class Search:
 
-    def __init__(self, dataset_name, classifiers, validation_strategy, validation_size, total_budget,
+    def __init__(self, dataset_name, iter, classifiers, validation_strategy, validation_size, total_budget,
                  per_run_budget, output_dir, random_state):
         self.dataset_name = dataset_name  # dataset name
+        self.iter = iter  # dataset iteration number
         self.dataset_dir = os.path.join(os.path.dirname(
-            __file__), 'data/processed/' + self.dataset_name + '/iter1')
+            __file__), 'data/processed/' + self.dataset_name + '/iter' + str(self.iter))
         self.classifiers = classifiers  # PyOD algorithms to use
         self.search_space_size = get_search_space_size(
             classifiers)  # size of the search
@@ -93,7 +94,7 @@ class Search:
 
     def print_search_details(self):
         print('Running Search:')
-        print('  Dataset:\t', self.dataset_name)
+        print('  Dataset:\t', self.dataset_name + ' ' + str(self.iter))
         print('  Type:\t\t', self.search_type)
         print('  Budget:\t', self.total_budget)
         print('  Validation:\t ({}, {})'.format(
@@ -126,7 +127,7 @@ class Search:
         # Build automl classifier
         self.automl = self.build_automl()
         self.automl.fit(X_train, y_train, X_test,
-                        y_test, dataset_name=self.dataset_name)
+                        y_test, dataset_name=self.dataset_name+str(self.iter))
         # Save results
         self.cv_results = pd.DataFrame.from_dict(self.automl.cv_results_)
         self.performance_over_time = self.automl.performance_over_time_
@@ -150,8 +151,9 @@ class Search:
 
     def plot_scores(self):
         # Filename and directory
-        title = '{}_{}_{}_{}'.format(
+        title = '{}_{}_{}_{}_{}'.format(
             self.dataset_name,
+            str(self.iter),
             self.search_type,
             self.validation_strategy,
             self.validation_size
@@ -190,8 +192,9 @@ class Search:
 
     def save_results(self):
         # Filename
-        title = '{}_{}_{}_{}'.format(
+        title = '{}_{}_{}_{}_{}'.format(
             self.dataset_name,
+            str(self.iter),
             self.search_type,
             self.validation_strategy,
             self.validation_size
@@ -212,31 +215,31 @@ class Search:
 
 class SMACSearch(Search):
 
-    def __init__(self, dataset_name, classifiers, validation_strategy, validation_size=200,
+    def __init__(self, dataset_name, iter, classifiers, validation_strategy, validation_size=200,
                  total_budget=600, per_run_budget=30, output_dir='output', random_state=123):
         self.search_type = 'smac'
         self.smac_object_callback = None
-        super().__init__(dataset_name, classifiers, validation_strategy, validation_size,
+        super().__init__(dataset_name, iter, classifiers, validation_strategy, validation_size,
                          total_budget, per_run_budget, output_dir, random_state)
 
 
 class RandomSearch(Search):
 
-    def __init__(self, dataset_name, classifiers, validation_strategy, validation_size=200,
+    def __init__(self, dataset_name, iter, classifiers, validation_strategy, validation_size=200,
                  total_budget=600, per_run_budget=30, output_dir='output', random_state=123):
         self.search_type = 'random'
         self.smac_object_callback = get_random_search_object_callback
-        super().__init__(dataset_name, classifiers, validation_strategy, validation_size,
+        super().__init__(dataset_name, iter, classifiers, validation_strategy, validation_size,
                          total_budget, per_run_budget, output_dir, random_state)
 
 
 class EquallyDistributedBudgetSearch(Search):
-    def __init__(self, dataset_name, classifiers, validation_strategy, validation_size=200,
+    def __init__(self, dataset_name, iter, classifiers, validation_strategy, validation_size=200,
                  total_budget=600, per_run_budget=30, output_dir='output', random_state=123):
         self.search_type = 'edb'
         # Random permutation of classifiers
         random.shuffle(classifiers)
-        super().__init__(dataset_name, classifiers, validation_strategy, validation_size,
+        super().__init__(dataset_name, iter, classifiers, validation_strategy, validation_size,
                          total_budget, per_run_budget, output_dir, random_state)
 
     def run(self):
@@ -251,6 +254,7 @@ class EquallyDistributedBudgetSearch(Search):
             # define random search object
             rs = RandomSearch(
                 self.dataset_name,
+                self.iter,
                 [clf],
                 self.validation_strategy,
                 self.validation_size,
@@ -285,26 +289,6 @@ class EquallyDistributedBudgetSearch(Search):
         return df
 
 
-class BOSHSearch(Search):
-    def __init__(self, dataset_name, classifiers, validation_strategy, validation_size=200,
-                 total_budget=600, per_run_budget=30, output_dir='output', random_state=123):
-        self.search_type = 'bosh'
-        self.smac_object_callback = get_bosh_object_callback(
-            'iterations')  # BOSH callback
-        super().__init__(dataset_name, classifiers, validation_size,
-                         total_budget, per_run_budget, output_dir, random_state)
-
-
-class BOHBSearch(Search):
-    def __init__(self, dataset_name, classifiers, validation_strategy, validation_size=200,
-                 total_budget=600, per_run_budget=30, output_dir='output', random_state=123):
-        self.search_type = 'bohb'
-        self.smac_object_callback = get_bohb_object_callback(
-            'iterations')  # BOHB callback
-        super().__init__(dataset_name, classifiers, validation_strategy, validation_size,
-                         total_budget, per_run_budget, output_dir, random_state)
-
-
 def get_random_search_object_callback(
     scenario_dict,
     seed,
@@ -331,107 +315,3 @@ def get_random_search_object_callback(
         dask_client=dask_client,
         n_jobs=n_jobs,
     )
-
-
-def get_bosh_object_callback(budget_type):
-    """ Successive Halving """
-    def get_smac_object(
-        scenario_dict,
-        seed,
-        ta,
-        ta_kwargs,
-        metalearning_configurations,
-        n_jobs,
-        dask_client,
-    ):
-        from smac.facade.smac_ac_facade import SMAC4AC
-        from smac.intensification.successive_halving import SuccessiveHalving
-        from smac.runhistory.runhistory2epm import RunHistory2EPM4LogCost
-        from smac.scenario.scenario import Scenario
-
-        if n_jobs > 1 or (dask_client and len(dask_client.nthreads()) > 1):
-            raise ValueError("Please make sure to guard the code invoking Auto-sklearn by "
-                             "`if __name__ == '__main__'` and remove this exception.")
-
-        scenario = Scenario(scenario_dict)
-        if len(metalearning_configurations) > 0:
-            default_config = scenario.cs.get_default_configuration()
-            initial_configurations = [
-                default_config] + metalearning_configurations
-        else:
-            initial_configurations = None
-        rh2EPM = RunHistory2EPM4LogCost
-
-        ta_kwargs['budget_type'] = budget_type
-
-        return SMAC4AC(
-            scenario=scenario,
-            rng=seed,
-            runhistory2epm=rh2EPM,
-            tae_runner=ta,
-            tae_runner_kwargs=ta_kwargs,
-            initial_configurations=initial_configurations,
-            run_id=seed,
-            intensifier=SuccessiveHalving,
-            intensifier_kwargs={
-                'initial_budget': 10.0,
-                'max_budget': 100,
-                'eta': 2,
-                'min_chall': 1
-            },
-            n_jobs=n_jobs,
-            dask_client=dask_client,
-        )
-    return get_smac_object
-
-
-def get_bohb_object_callback(budget_type):
-    """ Hyperband """
-    def get_smac_object(
-        scenario_dict,
-        seed,
-        ta,
-        ta_kwargs,
-        metalearning_configurations,
-        n_jobs,
-        dask_client,
-    ):
-        from smac.facade.smac_ac_facade import SMAC4AC
-        from smac.intensification.hyperband import Hyperband
-        from smac.runhistory.runhistory2epm import RunHistory2EPM4LogCost
-        from smac.scenario.scenario import Scenario
-
-        if n_jobs > 1 or (dask_client and len(dask_client.nthreads()) > 1):
-            raise ValueError("Please make sure to guard the code invoking Auto-sklearn by "
-                             "`if __name__ == '__main__'` and remove this exception.")
-
-        scenario = Scenario(scenario_dict)
-        if len(metalearning_configurations) > 0:
-            default_config = scenario.cs.get_default_configuration()
-            initial_configurations = [
-                default_config] + metalearning_configurations
-        else:
-            initial_configurations = None
-        rh2EPM = RunHistory2EPM4LogCost
-
-        ta_kwargs['budget_type'] = budget_type
-
-        return SMAC4AC(
-            scenario=scenario,
-            rng=seed,
-            runhistory2epm=rh2EPM,
-            tae_runner=ta,
-            tae_runner_kwargs=ta_kwargs,
-            initial_configurations=initial_configurations,
-            run_id=seed,
-            intensifier=Hyperband,
-            intensifier_kwargs={
-                'initial_budget': 10.0,
-                'max_budget': 100,
-                'eta': 2,
-                'min_chall': 1
-            },
-            n_jobs=n_jobs,
-            dask_client=dask_client,
-        )
-    return get_smac_object
