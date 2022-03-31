@@ -247,13 +247,13 @@ def get_search_space_size(clf_list):
         clf_list (list): the list of classifiers
 
     Returns:
-        size: the estimated size of the combined search space
+        size (int): the estimated size of the combined search space
     """
     size = 0
     for clf in clf_list:
         clf_size = get_search_space(clf).estimate_size()
         size += clf_size
-    return size
+    return int(size)
 
 
 def get_validation_strategy(h_num=0):

@@ -27,16 +27,13 @@ if __name__ == "__main__":
         'LOFClassifier',
     ]
 
-    # Budget estimation
-    # TODO
-
     # Budget constraints
     # TODO: should be based estimated budget
     total_budget = 600
     per_run_budget = 30
 
     # Dataset iteration number
-    iter = 3
+    iter = 1
 
     # Current timestamp string
     timestamp = time.strftime("%Y%m%d_%H%M%S")
