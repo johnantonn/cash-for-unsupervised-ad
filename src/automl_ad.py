@@ -10,12 +10,12 @@ if __name__ == "__main__":
 
     # List of datasets
     datasets = [
-        # 'ALOI',
-        # 'Annthyroid',
+        'ALOI',
+        'Annthyroid',
         'Cardiotocography',
-        # 'PageBlocks',
-        # 'SpamBase',
-        # 'Waveform'
+        'PageBlocks',
+        'SpamBase',
+        'Waveform'
     ]
 
     # PyOD algorithms to use
@@ -32,7 +32,7 @@ if __name__ == "__main__":
 
     # Budget constraints
     # TODO: should be based estimated budget
-    total_budget = 150
+    total_budget = 600
     per_run_budget = 30
 
     # Dataset iteration number
