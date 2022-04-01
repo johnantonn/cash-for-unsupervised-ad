@@ -13,9 +13,9 @@ if __name__ == "__main__":
         'ALOI',
         'Annthyroid',
         'Cardiotocography',
-        # 'PageBlocks',
-        # 'SpamBase',
-        # 'Waveform'
+        'PageBlocks',
+        'SpamBase',
+        'Waveform'
     ]
 
     # PyOD algorithms to use
