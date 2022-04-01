@@ -13,9 +13,9 @@ if __name__ == "__main__":
         'ALOI',
         'Annthyroid',
         'Cardiotocography',
-        'PageBlocks',
-        'SpamBase',
-        'Waveform'
+        # 'PageBlocks',
+        # 'SpamBase',
+        # 'Waveform'
     ]
 
     # PyOD algorithms to use
@@ -28,8 +28,7 @@ if __name__ == "__main__":
     ]
 
     # Budget constraints
-    # TODO: should be based estimated budget
-    total_budget = 600
+    total_budget = 300
     per_run_budget = 30
 
     # Dataset iteration number
@@ -38,12 +37,16 @@ if __name__ == "__main__":
     # Current timestamp string
     timestamp = time.strftime("%Y%m%d_%H%M%S")
 
+    # Experiment parameters
+    v_strategy = 2  # validation strategy parameter
+    v_size = 1  # validation size parameter
+
     # Loop over datsets
     for dataset in datasets:
         # Loop over validation strategy
-        for validation_strategy in get_validation_strategy():
+        for validation_strategy in get_validation_strategy(v_strategy):
             # Loop over validation set size values
-            for validation_size in get_validation_set_size(dataset, iter):
+            for validation_size in get_validation_set_size(dataset, iter, v_size):
 
                 # Equally distributed budget search
                 edb_search = EquallyDistributedBudgetSearch(

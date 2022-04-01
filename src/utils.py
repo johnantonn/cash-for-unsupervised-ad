@@ -294,7 +294,7 @@ def get_validation_set_size(dataset, iter=1, h_num=0):
     """
     # Hypothesis condition
     if h_num == 1:
-        return [20, 50, 100, 200, 400]
+        return [20, 50, 100, 200]
     elif h_num in [0, 2, 3]:
         dataset_dir = os.path.join(os.path.dirname(
             __file__), 'data/processed/' + dataset + '/iter'+str(iter))
