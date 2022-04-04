@@ -1,6 +1,6 @@
 import os
-import pandas as pd
 import random
+import pandas as pd
 from matplotlib import pyplot as plt
 from datetime import timedelta as td
 from smac.facade.roar_facade import ROAR
@@ -73,6 +73,7 @@ class Search:
             __file__), 'output', output_dir)  # output directory
         if not os.path.exists(self.output_dir):
             os.makedirs(self.output_dir)
+        self.save_metadata()  # save metadata info
 
     def build_automl(self):
         return AutoSklearnClassifier(
@@ -151,7 +152,7 @@ class Search:
 
     def plot_scores(self):
         # Filename and directory
-        title = '{}_{}_{}_{}_{}'.format(
+        fname = '{}_{}_{}_{}_{}F'.format(
             self.dataset_name,
             str(self.iter),
             self.search_type,
@@ -185,14 +186,50 @@ class Search:
         plt.ylim([0.5, 1.])
         plt.xlabel('seconds')
         plt.ylabel('score')
-        plt.title(title)
+        plt.title(fname)
         plt.grid()
         plt.show()
-        plt.savefig(os.path.join(plots_dir, title+'.png'))
+        plt.savefig(os.path.join(plots_dir, fname+'.png'))
+
+    def save_metadata(self):
+        import csv
+        # filename
+        fname = 'metadata.csv'
+        fpath = os.path.join(self.output_dir, fname)
+        fexists = os.path.isfile(fpath)
+        # data
+        data = [
+            self.dataset_name,
+            self.iter,
+            self.search_type,
+            len(self.classifiers),
+            self.validation_strategy,
+            self.validation_size,
+            self.total_budget,
+            self.per_run_budget
+        ]
+        # open file for write
+        with open(fpath, 'a', encoding='UTF8') as f:
+            writer = csv.writer(f)
+            if not fexists:
+                # define header
+                header = [
+                    'dataset_name',
+                    'dataset_iter',
+                    'search_type',
+                    'num_classifiers',
+                    'validation_strategy',
+                    'validation_size',
+                    'total_budget',
+                    'per_run_budget'
+                ]
+                # write header
+                writer.writerow(header)
+            # write data
+            writer.writerow(data)
 
     def save_results(self):
-        # Filename
-        title = '{}_{}_{}_{}_{}'.format(
+        fname = '{}_{}_{}_{}_{}'.format(
             self.dataset_name,
             str(self.iter),
             self.search_type,
@@ -207,18 +244,21 @@ class Search:
             os.makedirs(performance_dir)
         # cv_results
         self.cv_results.to_csv(os.path.join(
-            cv_results_dir, title+'.csv'), index=False)
+            cv_results_dir, fname+'.csv'), index=False)
         # performance_over_time
         self.performance_over_time.to_csv(os.path.join(
-            performance_dir, title+'.csv'), index=False)
+            performance_dir, fname+'.csv'), index=False)
 
 
 class SMACSearch(Search):
 
     def __init__(self, dataset_name, iter, classifiers, validation_strategy, validation_size=200,
                  total_budget=600, per_run_budget=30, output_dir='output', random_state=123):
+        # Search type
         self.search_type = 'smac'
+        # SMAC object callback is None
         self.smac_object_callback = None
+        # Call parent constructor
         super().__init__(dataset_name, iter, classifiers, validation_strategy, validation_size,
                          total_budget, per_run_budget, output_dir, random_state)
 
@@ -227,8 +267,11 @@ class RandomSearch(Search):
 
     def __init__(self, dataset_name, iter, classifiers, validation_strategy, validation_size=200,
                  total_budget=600, per_run_budget=30, output_dir='output', random_state=123):
+        # Search type
         self.search_type = 'random'
+        # SMAC object callbak for random search
         self.smac_object_callback = get_random_search_object_callback
+        # Call parent constructor
         super().__init__(dataset_name, iter, classifiers, validation_strategy, validation_size,
                          total_budget, per_run_budget, output_dir, random_state)
 
@@ -236,9 +279,11 @@ class RandomSearch(Search):
 class EquallyDistributedBudgetSearch(Search):
     def __init__(self, dataset_name, iter, classifiers, validation_strategy, validation_size=200,
                  total_budget=600, per_run_budget=30, output_dir='output', random_state=123):
+        # Search type
         self.search_type = 'edb'
         # Random permutation of classifiers
         random.shuffle(classifiers)
+        # Call parent constructor
         super().__init__(dataset_name, iter, classifiers, validation_strategy, validation_size,
                          total_budget, per_run_budget, output_dir, random_state)
 

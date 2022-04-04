@@ -306,7 +306,7 @@ def get_validation_set_size(dataset, iter=1, h_num=0):
 
 
 def train_valid_split(labels, validation_strategy='stratified',
-                      validation_size=200, print_flag=False):
+                      validation_size=200, print_flag=True):
     """
     Function that takes a list of `labels` and returns
     indices for training and validation sets according
@@ -319,13 +319,13 @@ def train_valid_split(labels, validation_strategy='stratified',
         print_flag (boolean): whether to print split stats
 
     Returns:
-        train_valid_indices (list): A list indicating whether the
+        idx_train_val (list): A list indicating whether the
         corresponding index will be part of the training set (0)
         or the validation set (1).
     """
 
     # Initialize
-    train_valid_indices = -np.ones(len(labels), dtype=int)  # all in training
+    idx_train_val = -np.ones(len(labels), dtype=int)  # all in training
     labels_0 = np.where(labels == 0)[0]  # normal points
     labels_1 = np.where(labels == 1)[0]  # outliers
     p_outlier = 0.  # outlier percentage
@@ -341,30 +341,37 @@ def train_valid_split(labels, validation_strategy='stratified',
             'The provided value of `validation_strategy`: {} is not supported!'.format(validation_strategy))
 
     # number of outliers in validation set
-    n_outlier = round(p_outlier * validation_size)
+    n_outlier_val = round(p_outlier * validation_size)
     # number of normal points in validation set
-    n_normal = validation_size - n_outlier
+    n_normal_val = validation_size - n_outlier_val
     # indices of outliers for validation
-    outlier_valid_indices = np.random.choice(
-        labels_1, size=n_outlier, replace=False)
+    idx_outlier_val = np.random.choice(
+        labels_1, size=n_outlier_val, replace=False)
     # indices of normal points for validation
-    normal_valid_indices = np.random.choice(
-        labels_0, size=n_normal, replace=False)
+    idx_normal_val = np.random.choice(
+        labels_0, size=n_normal_val, replace=False)
     # concatenate (should be of length validation_size)
-    valid_indices = np.concatenate(
-        (normal_valid_indices, outlier_valid_indices))
+    idx_val = np.concatenate(
+        (idx_normal_val, idx_outlier_val))
     # construct the output list
-    train_valid_indices[valid_indices] = 1
+    idx_train_val[idx_val] = 1
 
     # print details
     if print_flag:
-        print('Outlier percentage:', p_outlier)
-        print('Size of the validation set:', validation_size)
-        print('Number of outliers:', n_outlier)
-        print('Number of normal points:', n_normal)
+        n_outlier_train = len(labels_1)-n_outlier_val
+        n_train = len(labels) - validation_size
+        print('Outliers in train_eval set:', len(labels_1))
+        print('Outliers in training set:', n_outlier_train)
+        print('Outliers in validation set:', n_outlier_val)
+        print('Percentage of outliers in train_eval set:',
+              len(labels_1)/len(labels))
+        print('Percentage of outliers in training set:',
+              n_outlier_train/n_train)
+        print('Percentage of outliers in validation set:',
+              n_outlier_val/validation_size)
 
     # Return indices
-    return train_valid_indices
+    return idx_train_val
 
 
 def get_metric_result(cv_results):
