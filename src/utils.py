@@ -4,8 +4,6 @@ import time
 import numpy as np
 import pandas as pd
 from scipy.io import arff
-from matplotlib import pyplot as plt
-from datetime import timedelta as td
 from autosklearn.pipeline.components.classification import add_classifier
 
 
@@ -37,25 +35,44 @@ def import_dataset(filepath):
 
 
 def load_config_values():
+    """
+    Function that loads the environment variables
+    in the main script.
+
+    Args:
+        None
+
+    Returns:
+        [...] the values of the environment variables
+    """
+    # Read json config file
     config_path = os.path.join(os.path.dirname(
         os.path.realpath(__file__)), 'config.json')
     with open(config_path, "r") as jsonfile:
         config = json.load(jsonfile)
+    # Create local params
     datasets = config['datasets']
     dataset_iter = config['dataset_iter']
     classifiers = config['classifiers']
     total_budget = config['total_budget']
     per_run_budget = config['per_run_budget']
-    v_strategy_param = config['v_strategy_param']
-    v_size_param = config['v_size_param']
+    v_strategy_default_flag = config['v_strategy_default_flag']
+    v_size_default_flag = config['v_size_default_flag']
     if config['output_dir']:
         output_dir = config['output_dir']
     else:
         output_dir = time.strftime("%Y%m%d_%H%M%S")
-
+    # Check if directory already exists
+    output_dir_path = os.path.join(os.path.dirname(
+        __file__), 'output', output_dir)
+    if os.path.exists(output_dir_path):
+        raise ValueError(
+            "Output directory `{}` already exists.".format(output_dir))
+    # Return params
     return datasets, dataset_iter, \
         classifiers, total_budget, per_run_budget, \
-        v_strategy_param, v_size_param, output_dir
+        v_strategy_default_flag, v_size_default_flag, \
+        output_dir
 
 
 def add_to_autosklearn_pipeline(classifiers):
@@ -64,7 +81,8 @@ def add_to_autosklearn_pipeline(classifiers):
     and adds them to Aut-Sklearn.
 
     Args:
-        classifiers(list): the list of classifiers to add
+        classifiers (list): the list of classifiers
+        to add
 
     Returns:
         None
@@ -188,29 +206,27 @@ def get_search_space_size(clf_list):
     return int(size)
 
 
-def get_validation_strategy(h_num=0):
+def get_validation_strategy_list(default=True):
     """
     Function that takes the hypothesis number and
     returns a list of values for the validation 
     strategy to be used in the search.
 
     Args:
-        h_num (string): hypothesis number {0, 1, 2, 3}
+        default (boolean): whether to use the default
+        value 'stratified' or both values
 
     Returns:
         (list): A list of possible validation strategies
 
     """
-    # Hypothesis condition
-    if h_num in [0, 1, 3]:
+    if default:
         return ['stratified']
-    elif h_num in [2]:
-        return ['stratified', 'balanced']
     else:
-        return ValueError('Wrong argument value: {}'.format(h_num))
+        return ['stratified', 'balanced']
 
 
-def get_validation_set_size(dataset, iter=1, h_num=0):
+def get_validation_size_list(dataset, iter=1, default=True):
     """
     Function that takes the name of the dataset and the
     hypothesis number and returns a list of values for
@@ -219,22 +235,21 @@ def get_validation_set_size(dataset, iter=1, h_num=0):
     Args:
         dataset (str): The name of the dataset
         h_num (string): hypothesis number {0, 1, 2, 3}
+        default (boolean): Whether to return the default
+        value
 
     Returns:
         (list): A list of possible validation set sizes
 
     """
-    # Hypothesis condition
-    if h_num == 1:
+    if default:
         return [20, 50, 100, 200]
-    elif h_num in [0, 2, 3]:
+    else:
         dataset_dir = os.path.join(os.path.dirname(
             __file__), 'data/processed/' + dataset + '/iter'+str(iter))
         y_train = pd.read_csv(os.path.join(dataset_dir, 'y_train.csv'))
         size = round(0.3 * y_train.shape[0])
         return [size]
-    else:
-        return ValueError('Wrong argument value: {}'.format(h_num))
 
 
 def train_valid_split(labels, validation_strategy='stratified',
@@ -331,60 +346,3 @@ def get_metric_result(cv_results):
     cols.extend([key for key in cv_results.keys()
                  if key.startswith('metric_')])
     return results[cols].sort_values(['rank_test_scores'])
-
-
-def plot_performance(out_dirname, total_budget):
-    '''
-    Function that plots the combined search performance
-    over time.
-    '''
-    # Import csv files
-    path = os.path.join(os.path.dirname(__file__),
-                        'output', out_dirname, 'performance')
-    fig, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2, 2, figsize=(12, 10))
-    for file in os.listdir(path):
-        df = pd.read_csv(os.path.join(path, file), parse_dates=['Timestamp'])
-        # validation score
-        x = (df.Timestamp-df.Timestamp[0]).apply(td.total_seconds)
-        x.at[x.shape[0]] = total_budget
-        yval = df.single_best_optimization_score
-        yval.at[yval.shape[0]] = yval.at[yval.shape[0]-1]
-        # test score
-        ytest = df.single_best_test_score
-        ytest.at[ytest.shape[0]] = ytest.at[ytest.shape[0]-1]
-        if 'balanced' in file:
-            ax1.plot(x, yval, label=file.split('.')[0])
-            ax1.set_ylim([0.5, 1.])
-            ax1.set_xlabel('seconds')
-            ax1.set_ylabel('score')
-            ax1.set_title('balanced-validation')
-            ax1.grid()
-            ax2.plot(x, ytest, label=file.split('.')[0])
-            ax2.set_ylim([0.5, 1.])
-            ax2.set_xlabel('seconds')
-            ax2.set_title('balanced-test')
-            ax2.grid()
-            for ax in [ax1, ax2]:
-                handles, labels = ax.get_legend_handles_labels()
-                labels, handles = zip(
-                    *sorted(zip(labels, handles), key=lambda t: t[0]))
-                ax.legend(handles, labels, loc='lower right')
-        elif 'stratified' in file:
-            ax3.plot(x, yval, label=file.split('.')[0])
-            ax3.set_ylim([0.5, 1.])
-            ax3.set_xlabel('seconds')
-            ax3.set_ylabel('score')
-            ax3.set_title('stratified-validation')
-            ax3.grid()
-            ax4.plot(x, ytest, label=file.split('.')[0])
-            ax4.set_ylim([0.5, 1.])
-            ax4.set_xlabel('seconds')
-            ax4.set_title('stratified-test')
-            ax4.grid()
-            for ax in [ax3, ax4]:
-                handles, labels = ax.get_legend_handles_labels()
-                labels, handles = zip(
-                    *sorted(zip(labels, handles), key=lambda t: t[0]))
-                ax.legend(handles, labels, loc='lower right')
-    fig_title = 'all_' + str(total_budget) + '.png'
-    plt.savefig(os.path.join(path, fig_title))

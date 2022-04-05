@@ -71,10 +71,8 @@ class Search:
         self.performance_over_time = None  # as DataFrame
         self.output_dir = os.path.join(os.path.dirname(
             __file__), 'output', output_dir)  # output directory
-        if os.path.exists(self.output_dir):
-            raise ValueError(
-                "Output directory `{}` already exists.".format(self.output_dir))
-        os.makedirs(self.output_dir)
+        if not os.path.exists(self.output_dir):
+            os.makedirs(self.output_dir)
         self.save_metadata()  # save metadata info
 
     def build_automl(self):

@@ -1,13 +1,13 @@
 from search import RandomSearch, SMACSearch, EquallyDistributedBudgetSearch
-from utils import add_to_autosklearn_pipeline, get_validation_set_size, \
-    get_validation_strategy, load_config_values
+from utils import add_to_autosklearn_pipeline, get_validation_size_list, \
+    get_validation_strategy_list, load_config_values
 
 if __name__ == "__main__":
 
     # Load experiment parameters
     datasets, dataset_iter, \
         classifiers, total_budget, per_run_budget, \
-        v_strategy_param, v_size_param, \
+        v_strategy_default_flag, v_size_default_flag, \
         output_dir = load_config_values()
 
     # Add classifiers to Auto-Sklearn
@@ -16,9 +16,9 @@ if __name__ == "__main__":
     # Loop over datsets
     for dataset in datasets:
         # Loop over validation strategy
-        for validation_strategy in get_validation_strategy(v_strategy_param):
+        for validation_strategy in get_validation_strategy_list(v_strategy_default_flag):
             # Loop over validation set size values
-            for validation_size in get_validation_set_size(dataset, dataset_iter, v_size_param):
+            for validation_size in get_validation_size_list(dataset, dataset_iter, v_size_default_flag):
 
                 # Equally distributed budget search
                 edb_search = EquallyDistributedBudgetSearch(
