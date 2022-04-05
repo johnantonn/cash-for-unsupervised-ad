@@ -1,4 +1,6 @@
 import os
+import json
+import time
 import numpy as np
 import pandas as pd
 from scipy.io import arff
@@ -34,138 +36,82 @@ def import_dataset(filepath):
     return df
 
 
-def add_pyod_models_to_pipeline():
+def load_config_values():
+    config_path = os.path.join(os.path.dirname(
+        os.path.realpath(__file__)), 'config.json')
+    with open(config_path, "r") as jsonfile:
+        config = json.load(jsonfile)
+    datasets = config['datasets']
+    dataset_iter = config['dataset_iter']
+    classifiers = config['classifiers']
+    total_budget = config['total_budget']
+    per_run_budget = config['per_run_budget']
+    v_strategy_param = config['v_strategy_param']
+    v_size_param = config['v_size_param']
+    if config['output_dir']:
+        output_dir = config['output_dir']
+    else:
+        output_dir = time.strftime("%Y%m%d_%H%M%S")
+
+    return datasets, dataset_iter, \
+        classifiers, total_budget, per_run_budget, \
+        v_strategy_param, v_size_param, output_dir
+
+
+def add_to_autosklearn_pipeline(classifiers):
     """
-    Function that imports the external PyOD models
+    Function that imports the provided PyOD models
     and adds them to Aut-Sklearn.
 
     Args:
-        None
+        classifiers(list): the list of classifiers to add
 
     Returns:
         None
     """
-    # Import Auto-Sklearn-compatible PyOD algorithms
-    from pyod_models.abod import ABODClassifier  # probabilistic
-    from pyod_models.cblof import CBLOFClassifier  # proximity-based
-    from pyod_models.cof import COFClassifier  # proximity-based
-    from pyod_models.copod import COPODClassifier  # probabilistic
-    from pyod_models.ecod import ECODClassifier  # probabilistic
-    from pyod_models.hbos import HBOSClassifier  # proximity-based
-    from pyod_models.iforest import IForestClassifier  # outlier ensembles
-    from pyod_models.knn import KNNClassifier  # proximity-based
-    from pyod_models.lmdd import LMDDClassifier  # linear model
-    from pyod_models.loci import LOCIClassifier  # proximity-based
-    from pyod_models.lof import LOFClassifier  # proximity-based
-    from pyod_models.mad import MADClassifier  # probabilistic
-    from pyod_models.mcd import MCDClassifier  # linear model
-    from pyod_models.ocsvm import OCSVMClassifier  # linear model
-    from pyod_models.pca import PCAClassifier  # linear model
-    from pyod_models.rod import RODClassifier  # proximity-based
-    from pyod_models.sod import SODClassifier  # proximity-based
-    from pyod_models.sos import SOSClassifier  # probabilistic
-    # Add to Auto-Sklearn pipeline
-    add_classifier(ABODClassifier)
-    add_classifier(CBLOFClassifier)
-    add_classifier(COFClassifier)
-    add_classifier(COPODClassifier)
-    add_classifier(ECODClassifier)
-    add_classifier(HBOSClassifier)
-    add_classifier(IForestClassifier)
-    add_classifier(KNNClassifier)
-    add_classifier(LMDDClassifier)
-    add_classifier(LOCIClassifier)
-    add_classifier(LOFClassifier)
-    add_classifier(MADClassifier)
-    add_classifier(MCDClassifier)
-    add_classifier(OCSVMClassifier)
-    add_classifier(PCAClassifier)
-    add_classifier(RODClassifier)
-    add_classifier(SODClassifier)
-    add_classifier(SOSClassifier)
-
-
-def clf_lookup(clf_name):
-    """
-    Function that returns a classifier's object instance
-    given its name.
-
-    Args:
-        clf_name (str): the classifier name
-
-    Returns:
-        clf: the classifier's object instance
-    """
-    # ABOD
-    if clf_name == 'ABODClassifier':
-        from pyod_models.abod import ABODClassifier
-        return ABODClassifier(
-            **ABODClassifier.get_hyperparameter_search_space().get_default_configuration())
-    # CBLOF
-    if clf_name == 'CBLOFClassifier':
-        from pyod_models.cblof import CBLOFClassifier
-        return CBLOFClassifier(
-            **CBLOFClassifier.get_hyperparameter_search_space().get_default_configuration())
-    # COPOD
-    if clf_name == 'COPODClassifier':
-        from pyod_models.copod import COPODClassifier
-        return COPODClassifier(
-            **COPODClassifier.get_hyperparameter_search_space().get_default_configuration())
-    # ECOD
-    if clf_name == 'ECODClassifier':
-        from pyod_models.ecod import ECODClassifier
-        return ECODClassifier(
-            **ECODClassifier.get_hyperparameter_search_space().get_default_configuration())
-    # HBOS
-    if clf_name == 'HBOSClassifier':
-        from pyod_models.hbos import HBOSClassifier
-        return HBOSClassifier(
-            **HBOSClassifier.get_hyperparameter_search_space().get_default_configuration())
-    # IForest
-    if clf_name == 'IForestClassifier':
-        from pyod_models.iforest import IForestClassifier
-        return IForestClassifier(
-            **IForestClassifier.get_hyperparameter_search_space().get_default_configuration())
-    # KNN
-    if clf_name == 'KNNClassifier':
-        from pyod_models.knn import KNNClassifier
-        return KNNClassifier(
-            **KNNClassifier.get_hyperparameter_search_space().get_default_configuration())
-    # LMDD
-    if clf_name == 'LMDDClassifier':
-        from pyod_models.lmdd import LMDDClassifier
-        return LMDDClassifier(
-            **LMDDClassifier.get_hyperparameter_search_space().get_default_configuration())
-    # LOF
-    if clf_name == 'LOFClassifier':
-        from pyod_models.lof import LOFClassifier
-        return LOFClassifier(
-            **LOFClassifier.get_hyperparameter_search_space().get_default_configuration())
-    # MCD
-    if clf_name == 'MCDClassifier':
-        from pyod_models.mcd import MCDClassifier
-        return MCDClassifier(
-            **MCDClassifier.get_hyperparameter_search_space().get_default_configuration())
-    # OCSVM
-    if clf_name == 'OCSVMClassifier':
-        from pyod_models.ocsvm import OCSVMClassifier
-        return OCSVMClassifier(
-            **OCSVMClassifier.get_hyperparameter_search_space().get_default_configuration())
-    # PCA
-    if clf_name == 'PCAClassifier':
-        from pyod_models.pca import PCAClassifier
-        return PCAClassifier(
-            **PCAClassifier.get_hyperparameter_search_space().get_default_configuration())
-    # ROD
-    if clf_name == 'RODClassifier':
-        from pyod_models.rod import RODClassifier
-        return RODClassifier(
-            **RODClassifier.get_hyperparameter_search_space().get_default_configuration())
-    # SOS
-    if clf_name == 'SOSClassifier':
-        from pyod_models.sos import SOSClassifier
-        return SOSClassifier(
-            **SOSClassifier.get_hyperparameter_search_space().get_default_configuration())
+    for clf_name in classifiers:
+        if clf_name == 'ABODClassifier':
+            from pyod_models.abod import ABODClassifier
+            add_classifier(ABODClassifier)
+        if clf_name == 'CBLOFClassifier':
+            from pyod_models.cblof import CBLOFClassifier
+            add_classifier(CBLOFClassifier)
+        if clf_name == 'COPODClassifier':
+            from pyod_models.copod import COPODClassifier
+            add_classifier(COPODClassifier)
+        if clf_name == 'ECODClassifier':
+            from pyod_models.ecod import ECODClassifier
+            add_classifier(ECODClassifier)
+        if clf_name == 'HBOSClassifier':
+            from pyod_models.hbos import HBOSClassifier
+            add_classifier(HBOSClassifier)
+        if clf_name == 'IForestClassifier':
+            from pyod_models.iforest import IForestClassifier
+            add_classifier(IForestClassifier)
+        if clf_name == 'KNNClassifier':
+            from pyod_models.knn import KNNClassifier
+            add_classifier(KNNClassifier)
+        if clf_name == 'LMDDClassifier':
+            from pyod_models.lmdd import LMDDClassifier
+            add_classifier(LMDDClassifier)
+        if clf_name == 'LOFClassifier':
+            from pyod_models.lof import LOFClassifier
+            add_classifier(LOFClassifier)
+        if clf_name == 'MCDClassifier':
+            from pyod_models.mcd import MCDClassifier
+            add_classifier(MCDClassifier)
+        if clf_name == 'OCSVMClassifier':
+            from pyod_models.ocsvm import OCSVMClassifier
+            add_classifier(OCSVMClassifier)
+        if clf_name == 'PCAClassifier':
+            from pyod_models.pca import PCAClassifier
+            add_classifier(PCAClassifier)
+        if clf_name == 'RODClassifier':
+            from pyod_models.rod import RODClassifier
+            add_classifier(RODClassifier)
+        if clf_name == 'SOSClassifier':
+            from pyod_models.sos import SOSClassifier
+            add_classifier(SOSClassifier)
 
 
 def get_search_space(clf_name):
@@ -179,59 +125,45 @@ def get_search_space(clf_name):
     Returns:
         search_space: the classifier's search space
     """
-    # ABOD
     if clf_name == 'ABODClassifier':
         from pyod_models.abod import ABODClassifier
         return ABODClassifier.get_hyperparameter_search_space()
-    # CBLOF
     if clf_name == 'CBLOFClassifier':
         from pyod_models.cblof import CBLOFClassifier
         return CBLOFClassifier.get_hyperparameter_search_space()
-    # COPOD
     if clf_name == 'COPODClassifier':
         from pyod_models.copod import COPODClassifier
         return COPODClassifier.get_hyperparameter_search_space()
-    # ECOD
     if clf_name == 'ECODClassifier':
         from pyod_models.ecod import ECODClassifier
         return ECODClassifier.get_hyperparameter_search_space()
-    # HBOS
     if clf_name == 'HBOSClassifier':
         from pyod_models.hbos import HBOSClassifier
         return HBOSClassifier.get_hyperparameter_search_space()
-    # IForest
     if clf_name == 'IForestClassifier':
         from pyod_models.iforest import IForestClassifier
         return IForestClassifier.get_hyperparameter_search_space()
-    # KNN
     if clf_name == 'KNNClassifier':
         from pyod_models.knn import KNNClassifier
         return KNNClassifier.get_hyperparameter_search_space()
-    # LMDD
     if clf_name == 'LMDDClassifier':
         from pyod_models.lmdd import LMDDClassifier
         return LMDDClassifier.get_hyperparameter_search_space()
-    # LOF
     if clf_name == 'LOFClassifier':
         from pyod_models.lof import LOFClassifier
         return LOFClassifier.get_hyperparameter_search_space()
-    # MCD
     if clf_name == 'MCDClassifier':
         from pyod_models.mcd import MCDClassifier
         return MCDClassifier.get_hyperparameter_search_space()
-    # OCSVM
     if clf_name == 'OCSVMClassifier':
         from pyod_models.ocsvm import OCSVMClassifier
         return OCSVMClassifier.get_hyperparameter_search_space()
-    # PCA
     if clf_name == 'PCAClassifier':
         from pyod_models.pca import PCAClassifier
         return PCAClassifier.get_hyperparameter_search_space()
-    # ROD
     if clf_name == 'RODClassifier':
         from pyod_models.rod import RODClassifier
         return RODClassifier.get_hyperparameter_search_space()
-    # SOS
     if clf_name == 'SOSClassifier':
         from pyod_models.sos import SOSClassifier
         return SOSClassifier.get_hyperparameter_search_space()

@@ -1,0 +1,19 @@
+{
+    "datasets": [
+        "Annthyroid",
+        "Cardiotocography"
+    ],
+    "dataset_iter": 1,
+    "classifiers": [
+        "CBLOFClassifier",
+        "COPODClassifier",
+        "IForestClassifier",
+        "KNNClassifier",
+        "LOFClassifier"
+    ],
+    "total_budget": 120,
+    "per_run_budget": 30,
+    "v_strategy_param": 1,
+    "v_size_param": 2,
+    "output_dir": "experiment1"
+}

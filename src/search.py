@@ -51,12 +51,12 @@ class NoPreprocessing(AutoSklearnPreprocessingAlgorithm):
 
 class Search:
 
-    def __init__(self, dataset_name, iter, classifiers, validation_strategy, validation_size, total_budget,
+    def __init__(self, dataset_name, dataset_iter, classifiers, validation_strategy, validation_size, total_budget,
                  per_run_budget, output_dir, random_state):
         self.dataset_name = dataset_name  # dataset name
-        self.iter = iter  # dataset iteration number
+        self.dataset_iter = dataset_iter  # dataset iteration number
         self.dataset_dir = os.path.join(os.path.dirname(
-            __file__), 'data/processed/' + self.dataset_name + '/iter' + str(self.iter))
+            __file__), 'data/processed/' + self.dataset_name + '/iter' + str(self.dataset_iter))
         self.classifiers = classifiers  # PyOD algorithms to use
         self.search_space_size = get_search_space_size(
             classifiers)  # size of the search
@@ -71,8 +71,10 @@ class Search:
         self.performance_over_time = None  # as DataFrame
         self.output_dir = os.path.join(os.path.dirname(
             __file__), 'output', output_dir)  # output directory
-        if not os.path.exists(self.output_dir):
-            os.makedirs(self.output_dir)
+        if os.path.exists(self.output_dir):
+            raise ValueError(
+                "Output directory `{}` already exists.".format(self.output_dir))
+        os.makedirs(self.output_dir)
         self.save_metadata()  # save metadata info
 
     def build_automl(self):
@@ -95,7 +97,7 @@ class Search:
 
     def print_search_details(self):
         print('Running Search:')
-        print('  Dataset:\t', self.dataset_name + ' ' + str(self.iter))
+        print('  Dataset:\t', self.dataset_name + ' ' + str(self.dataset_iter))
         print('  Type:\t\t', self.search_type)
         print('  Budget:\t', self.total_budget)
         print('  Validation:\t ({}, {})'.format(
@@ -128,7 +130,7 @@ class Search:
         # Build automl classifier
         self.automl = self.build_automl()
         self.automl.fit(X_train, y_train, X_test,
-                        y_test, dataset_name=self.dataset_name+str(self.iter))
+                        y_test, dataset_name=self.dataset_name+str(self.dataset_iter))
         # Save results
         self.cv_results = pd.DataFrame.from_dict(self.automl.cv_results_)
         self.performance_over_time = self.automl.performance_over_time_
@@ -152,9 +154,9 @@ class Search:
 
     def plot_scores(self):
         # Filename and directory
-        fname = '{}_{}_{}_{}_{}F'.format(
+        fname = '{}_{}_{}_{}_{}'.format(
             self.dataset_name,
-            str(self.iter),
+            str(self.dataset_iter),
             self.search_type,
             self.validation_strategy,
             self.validation_size
@@ -200,7 +202,7 @@ class Search:
         # data
         data = [
             self.dataset_name,
-            self.iter,
+            self.dataset_iter,
             self.search_type,
             len(self.classifiers),
             self.validation_strategy,
@@ -231,7 +233,7 @@ class Search:
     def save_results(self):
         fname = '{}_{}_{}_{}_{}'.format(
             self.dataset_name,
-            str(self.iter),
+            str(self.dataset_iter),
             self.search_type,
             self.validation_strategy,
             self.validation_size
@@ -252,39 +254,39 @@ class Search:
 
 class SMACSearch(Search):
 
-    def __init__(self, dataset_name, iter, classifiers, validation_strategy, validation_size=200,
+    def __init__(self, dataset_name, dataset_iter, classifiers, validation_strategy, validation_size=200,
                  total_budget=600, per_run_budget=30, output_dir='output', random_state=123):
         # Search type
         self.search_type = 'smac'
         # SMAC object callback is None
         self.smac_object_callback = None
         # Call parent constructor
-        super().__init__(dataset_name, iter, classifiers, validation_strategy, validation_size,
+        super().__init__(dataset_name, dataset_iter, classifiers, validation_strategy, validation_size,
                          total_budget, per_run_budget, output_dir, random_state)
 
 
 class RandomSearch(Search):
 
-    def __init__(self, dataset_name, iter, classifiers, validation_strategy, validation_size=200,
+    def __init__(self, dataset_name, dataset_iter, classifiers, validation_strategy, validation_size=200,
                  total_budget=600, per_run_budget=30, output_dir='output', random_state=123):
         # Search type
         self.search_type = 'random'
         # SMAC object callbak for random search
         self.smac_object_callback = get_random_search_object_callback
         # Call parent constructor
-        super().__init__(dataset_name, iter, classifiers, validation_strategy, validation_size,
+        super().__init__(dataset_name, dataset_iter, classifiers, validation_strategy, validation_size,
                          total_budget, per_run_budget, output_dir, random_state)
 
 
 class EquallyDistributedBudgetSearch(Search):
-    def __init__(self, dataset_name, iter, classifiers, validation_strategy, validation_size=200,
+    def __init__(self, dataset_name, dataset_iter, classifiers, validation_strategy, validation_size=200,
                  total_budget=600, per_run_budget=30, output_dir='output', random_state=123):
         # Search type
         self.search_type = 'edb'
         # Random permutation of classifiers
         random.shuffle(classifiers)
         # Call parent constructor
-        super().__init__(dataset_name, iter, classifiers, validation_strategy, validation_size,
+        super().__init__(dataset_name, dataset_iter, classifiers, validation_strategy, validation_size,
                          total_budget, per_run_budget, output_dir, random_state)
 
     def run(self):
@@ -299,7 +301,7 @@ class EquallyDistributedBudgetSearch(Search):
             # define random search object
             rs = RandomSearch(
                 self.dataset_name,
-                self.iter,
+                self.dataset_iter,
                 [clf],
                 self.validation_strategy,
                 self.validation_size,

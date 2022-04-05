@@ -1,63 +1,35 @@
-import time
 from search import RandomSearch, SMACSearch, EquallyDistributedBudgetSearch
-from utils import add_pyod_models_to_pipeline, get_validation_set_size, \
-    get_validation_strategy
+from utils import add_to_autosklearn_pipeline, get_validation_set_size, \
+    get_validation_strategy, load_config_values
 
 if __name__ == "__main__":
 
-    # Add models to Auto-Sklearn
-    add_pyod_models_to_pipeline()
+    # Load experiment parameters
+    datasets, dataset_iter, \
+        classifiers, total_budget, per_run_budget, \
+        v_strategy_param, v_size_param, \
+        output_dir = load_config_values()
 
-    # List of datasets
-    datasets = [
-        'ALOI',
-        'Annthyroid',
-        'Cardiotocography',
-        'PageBlocks',
-        'SpamBase',
-        'Waveform'
-    ]
-
-    # PyOD algorithms to use
-    classifiers = [
-        'CBLOFClassifier',
-        'COPODClassifier',
-        'IForestClassifier',
-        'KNNClassifier',
-        'LOFClassifier',
-    ]
-
-    # Budget constraints
-    total_budget = 300
-    per_run_budget = 30
-
-    # Dataset iteration number
-    iter = 1
-
-    # Current timestamp string
-    timestamp = time.strftime("%Y%m%d_%H%M%S")
-
-    # Experiment parameters
-    v_strategy = 2  # validation strategy parameter
-    v_size = 1  # validation size parameter
+    # Add classifiers to Auto-Sklearn
+    add_to_autosklearn_pipeline(classifiers)
 
     # Loop over datsets
     for dataset in datasets:
         # Loop over validation strategy
-        for validation_strategy in get_validation_strategy(v_strategy):
+        for validation_strategy in get_validation_strategy(v_strategy_param):
             # Loop over validation set size values
-            for validation_size in get_validation_set_size(dataset, iter, v_size):
+            for validation_size in get_validation_set_size(dataset, dataset_iter, v_size_param):
 
                 # Equally distributed budget search
                 edb_search = EquallyDistributedBudgetSearch(
                     dataset_name=dataset,
-                    iter=iter,
+                    dataset_iter=dataset_iter,
                     classifiers=classifiers,
                     validation_strategy=validation_strategy,
                     validation_size=validation_size,
                     total_budget=total_budget,
                     per_run_budget=per_run_budget,
-                    output_dir=timestamp
+                    output_dir=output_dir
                 )
                 try:
                     edb_search.run()
@@ -70,13 +42,13 @@ if __name__ == "__main__":
                 # Random search
                 random_search = RandomSearch(
                     dataset_name=dataset,
-                    iter=iter,
+                    dataset_iter=dataset_iter,
                     classifiers=classifiers,
                     validation_strategy=validation_strategy,
                     total_budget=total_budget,
                     validation_size=validation_size,
                     per_run_budget=per_run_budget,
-                    output_dir=timestamp
+                    output_dir=output_dir
                 )
                 try:
                     random_search.run()
@@ -91,13 +63,13 @@ if __name__ == "__main__":
                 # SMAC search
                 smac_search = SMACSearch(
                     dataset_name=dataset,
-                    iter=iter,
+                    dataset_iter=dataset_iter,
                     classifiers=classifiers,
                     validation_strategy=validation_strategy,
                     validation_size=validation_size,
                     total_budget=total_budget,
                     per_run_budget=per_run_budget,
-                    output_dir=timestamp
+                    output_dir=output_dir
                 )
                 try:
                     smac_search.run()
