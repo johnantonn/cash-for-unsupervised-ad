@@ -2,7 +2,10 @@
     "datasets": [
         "ALOI",
         "Annthyroid",
-        "Cardiotocography"
+        "Cardiotocography",
+        "KDDCup99",
+        "SpamBase",
+        "Waveform"
     ],
     "dataset_iter": 1,
     "classifiers": [
@@ -12,9 +15,9 @@
         "KNNClassifier",
         "LOFClassifier"
     ],
-    "total_budget": 150,
+    "total_budget": 600,
     "per_run_budget": 30,
     "v_strategy_default_flag": "False",
     "v_size_default_flag": "True",
-    "output_dir": "experiment2"
+    "output_dir": "w1"
 }

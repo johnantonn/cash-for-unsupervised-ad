@@ -56,8 +56,8 @@ def load_config_values():
     classifiers = config['classifiers']
     total_budget = config['total_budget']
     per_run_budget = config['per_run_budget']
-    v_strategy_default_flag = config['v_strategy_default_flag']
-    v_size_default_flag = config['v_size_default_flag']
+    v_strategy_default_flag = bool(config['v_strategy_default_flag'])
+    v_size_default_flag = bool(config['v_size_default_flag'])
     if config['output_dir']:
         output_dir = config['output_dir']
     else:
