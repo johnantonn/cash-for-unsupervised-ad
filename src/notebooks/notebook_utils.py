@@ -1,6 +1,7 @@
 import os
 import pandas as pd
 from scipy.io import arff
+from datetime import timedelta as td
 from autosklearn.pipeline.components.classification import add_classifier
 
 
@@ -31,24 +32,46 @@ def import_dataset(filepath):
     return df
 
 
-def fill_values(df, total_budget):
+def preprocess_df(df, budget):
+    '''
+    Takes a DataFrame object with the raw performance results 
+    from AutoSklearn and transform timestamps to seconds with
+    the first run as a reference.
+
+    Arguments:
+        df(pd.DataFrame): the dataframe of the results
+        budget(int): the total budget in seconds
+
+    Returns:
+        df(pd.DataFrame): the processed
+    '''
+    df.Timestamp = (df.Timestamp-df.Timestamp[0]).apply(td.total_seconds)
+    n = df.shape[0]
+    df.at[n, 'Timestamp'] = budget
+    df = df.astype({"Timestamp": int})
+    df.at[n, 'single_best_optimization_score'] = df.at[n-1, 'single_best_optimization_score']
+    df.at[n, 'single_best_test_score'] = df.at[n-1, 'single_best_test_score']
+    df = df.drop_duplicates().reset_index(drop=True)
+    return df
+
+
+def fill_values(df, budget):
     '''
     Takes a DataFrame object with the raw performance results 
     from AutoSklearn and applies transformations and aggregations 
     to produce a final DataFrame object containing the average 
-    performance values for every second based on `total_budget` 
-    parameter.
+    performance values for every second based on `budget` parameter.
 
     Arguments:
         df(pd.DataFrame): the dataframe of the results
-        total_budget(int): the total budget in seconds
+        budget(int): the total budget in seconds
 
     Returns:
-        df(pd.DataFrame): the processed df with `total_budget` rows
+        df(pd.DataFrame): the processed df with `budget` rows
     '''
     # Fill the missing values for `Timestamp` column
     ref_idx = 0  # the row index with the current max value
-    for i in range(1, total_budget):
+    for i in range(1, budget):
         if i not in df.Timestamp.values:
             n = df.shape[0]
             df.at[n, 'Timestamp'] = int(i)  # keep column name for consistency
