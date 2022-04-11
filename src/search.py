@@ -12,7 +12,7 @@ from autosklearn.pipeline.components.base import AutoSklearnPreprocessingAlgorit
 from autosklearn.classification import AutoSklearnClassifier
 from autosklearn.metrics import roc_auc, average_precision
 from sklearn.model_selection import PredefinedSplit
-from utils import train_valid_split, get_search_space_size
+from utils import train_valid_split
 
 
 class NoPreprocessing(AutoSklearnPreprocessingAlgorithm):
@@ -58,8 +58,6 @@ class Search:
         self.dataset_dir = os.path.join(os.path.dirname(
             __file__), 'data/processed/' + self.dataset_name + '/iter' + str(self.dataset_iter))
         self.classifiers = classifiers  # PyOD algorithms to use
-        self.search_space_size = get_search_space_size(
-            classifiers)  # size of the search
         self.validation_strategy = validation_strategy  # split strategy
         self.validation_size = validation_size  # validation set size
         self.total_budget = total_budget  # total budget in seconds
