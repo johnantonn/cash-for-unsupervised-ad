@@ -4,8 +4,11 @@
 # Input files
 **/data
 
-# Output
+# Output files
 **/output
+
+# Results from AutoSklearn runs
+**/results
 
 # Exceptions
 !data/.gitkeep
