@@ -2,6 +2,7 @@ import os
 import json
 import time
 import numpy as np
+import pandas as pd
 from autosklearn.pipeline.components.classification import add_classifier
 
 
@@ -177,17 +178,17 @@ def get_validation_strategy_list(default=True):
     strategy to be used in the search.
 
     Args:
-        default (boolean): whether to use the default
-        value 'stratified' or both values
+        default (boolean): whether to use one or both
+        strategy values
 
     Returns:
         (list): A list of possible validation strategies
 
     """
     if default:
-        return ['stratified']
-    else:
         return ['stratified', 'balanced']
+    else:
+        return ['stratified']
 
 
 def get_validation_size_list(dataset, iter=1, default=True):

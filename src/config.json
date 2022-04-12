@@ -17,7 +17,7 @@
     ],
     "total_budget": 600,
     "per_run_budget": 30,
-    "v_strategy_default_flag": "False",
-    "v_size_default_flag": "True",
-    "output_dir": "w1"
+    "v_strategy_default_flag": 1,
+    "v_size_default_flag": 1,
+    "output_dir": "all_600"
 }
