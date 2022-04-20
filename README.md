@@ -6,8 +6,10 @@
 ## Description
 The aim of the thesis is to solve the CASH optimization problem for anomaly detection using AutoML by experimenting on constrained and biased validation sets and compare the performance for several state-of-the-art frameworks such as:
 * Random Search
-* Equally Distributed Budget Search
+* Uniform Exploration
 * Bayesian Optimization (SMAC)
+* Hyperband
+* BOHB
 * etc.
 
 Several packages exist for solving CASH optimization, however the anomaly detection setting has not been explored thoroughly. An additional goal of this thesis is to extend **Auto-Sklearn** by incorporating anomaly detection algorithms from **PyOD** and evaluate their performance on a number of datasets with varying characteristics, e.g. number of available training points, number of available labels for validation/optimization etc.
