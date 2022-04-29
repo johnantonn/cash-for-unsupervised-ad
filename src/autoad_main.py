@@ -1,4 +1,4 @@
-from search import RandomSearch, SMACSearch, EquallyDistributedBudgetSearch
+from search import RandomSearch, SMACSearch, UniformExplorationSearch
 from utils import add_to_autosklearn_pipeline, get_validation_size_list, \
     get_validation_strategy_list, load_config_values
 
@@ -21,7 +21,7 @@ if __name__ == "__main__":
             for validation_size in get_validation_size_list(dataset, dataset_iter, v_size_default_flag):
 
                 # Equally distributed budget search
-                edb_search = EquallyDistributedBudgetSearch(
+                ue_search = UniformExplorationSearch(
                     dataset_name=dataset,
                     dataset_iter=dataset_iter,
                     classifiers=classifiers,
@@ -32,12 +32,12 @@ if __name__ == "__main__":
                     output_dir=output_dir
                 )
                 try:
-                    edb_search.run()
+                    ue_search.run()
                 except RuntimeError as err:
                     print(err)
                     continue
-                edb_search.plot_scores()
-                edb_search.save_results()
+                ue_search.plot_scores()
+                ue_search.save_results()
 
                 # Random search
                 random_search = RandomSearch(

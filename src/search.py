@@ -274,11 +274,11 @@ class RandomSearch(Search):
                          total_budget, per_run_budget, output_dir, random_state)
 
 
-class EquallyDistributedBudgetSearch(Search):
+class UniformExplorationSearch(Search):
     def __init__(self, dataset_name, dataset_iter, classifiers, validation_strategy, validation_size=200,
                  total_budget=600, per_run_budget=30, output_dir='output', random_state=123):
         # Search type
-        self.search_type = 'edb'
+        self.search_type = 'ue'
         # Random permutation of classifiers
         random.shuffle(classifiers)
         # Call parent constructor
