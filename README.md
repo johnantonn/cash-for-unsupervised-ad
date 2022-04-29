@@ -17,7 +17,7 @@ The aim of the thesis is to evaluate the CASH optimization problem for anomaly d
 Several packages exist for solving CASH optimization, however the anomaly detection setting has not been explored thoroughly yet. More specifically, there have been a number of research efforts that focus on specific characteristics of the anomaly detection setting, i.e. target time-series data, purely supvervised or purely unsupervised approaches.
 
 This thesis instead assumes the presence of a limited amount of labels for generating a validation set that can be used for optimization and evaluation purposes, while anomaly detection model training is unsupervised. This thesis contributes to the current state-of-the-art as follows:
- - Systematical evaluation of CASH algorithms in the context of anomaly detection by careful testing a number of hypotheses surrounding the structure of the validation set.
+ - Systematic experimental evaluation of CASH algorithms in the context of anomaly detection by careful testing a number of hypotheses surrounding the structure of the validation set.
  - Extending the core implementation of **Auto-Sklearn** by incorporating anomaly detection algorithms from **PyOD** and evaluate their performance.
 
 ## External links
