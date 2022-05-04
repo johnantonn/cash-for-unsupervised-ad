@@ -49,9 +49,11 @@ def preprocess_df(df, budget):
     n = df.shape[0]
     df.at[n, 'Timestamp'] = budget
     df = df.astype({"Timestamp": int})
-    df.at[n, 'single_best_optimization_score'] = df.at[n-1, 'single_best_optimization_score']
+    df.at[n, 'single_best_optimization_score'] = df.at[n -
+                                                       1, 'single_best_optimization_score']
     df.at[n, 'single_best_test_score'] = df.at[n-1, 'single_best_test_score']
-    df = df.drop_duplicates().reset_index(drop=True)
+    df = df.drop_duplicates(
+        subset=['Timestamp'], keep='last').reset_index(drop=True)
     return df
 
 
@@ -83,6 +85,7 @@ def fill_values(df, budget):
             ref_idx = df.index[df['Timestamp'] == i][0]
             #print('Changing index at Timestamp =', i)
     df = df.iloc[1:, :]  # discard first row
+    df = df[df['Timestamp'] > 0]
     df = df.sort_values(by='Timestamp').reset_index(
         drop=True)  # sort by timestamp
     # timestamp values (seconds) should be integer
