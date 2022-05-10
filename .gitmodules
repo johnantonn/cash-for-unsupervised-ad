@@ -1,3 +1,6 @@
 [submodule "auto-sklearn"]
 	path = auto-sklearn
 	url = https://github.com/johnantonn/auto-sklearn
+[submodule "src/ML-stats"]
+	path = src/ML-stats
+	url = https://github.com/Vincent-Vercruyssen/ML-stats
