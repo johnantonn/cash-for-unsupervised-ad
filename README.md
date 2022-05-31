@@ -8,8 +8,6 @@ The aim of the thesis is to evaluate the CASH optimization problem for anomaly d
 * Random Search
 * Uniform Exploration
 * Bayesian Optimization (SMAC)
-* Hyperband
-* BOHB
 * etc.
 
 
