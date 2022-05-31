@@ -4,11 +4,10 @@
 ![image](https://user-images.githubusercontent.com/8168416/160713379-cc39a1a2-85de-434f-9ee7-4d8ff51838e1.png)
 
 ## Description
-The aim of the thesis is to evaluate the CASH optimization problem for anomaly detection by systematically experimenting on different types and sizes of the validation set and compare the performance for several state-of-the-art frameworks such as:
+The aim of the thesis is to evaluate the CASH optimization problem for anomaly detection by systematically experimenting on different types and sizes of the validation set and compare the performance for the below search strategies:
 * Random Search
 * Uniform Exploration
 * Bayesian Optimization (SMAC)
-* etc.
 
 
 ## Contributions
