@@ -57,7 +57,7 @@ def add_to_autosklearn_pipeline(classifiers, search_space):
         if clf_name == 'ABODClassifier':
             if search_space == "sp1":
                 from pyod_models.sp1.abod import ABODClassifier
-            if search_space == "sp2":
+            elif search_space == "sp2":
                 from pyod_models.sp2.abod import ABODClassifier
             else:
                 from pyod_models.default.abod import ABODClassifier
@@ -65,7 +65,7 @@ def add_to_autosklearn_pipeline(classifiers, search_space):
         if clf_name == 'CBLOFClassifier':
             if search_space == "sp1":
                 from pyod_models.sp1.cblof import CBLOFClassifier
-            if search_space == "sp2":
+            elif search_space == "sp2":
                 from pyod_models.sp2.cblof import CBLOFClassifier
             else:
                 from pyod_models.default.cblof import CBLOFClassifier
@@ -73,7 +73,7 @@ def add_to_autosklearn_pipeline(classifiers, search_space):
         if clf_name == 'COPODClassifier':
             if search_space == "sp1":
                 from pyod_models.sp1.copod import COPODClassifier
-            if search_space == "sp2":
+            elif search_space == "sp2":
                 from pyod_models.sp2.copod import COPODClassifier
             else:
                 from pyod_models.default.copod import COPODClassifier
@@ -81,7 +81,7 @@ def add_to_autosklearn_pipeline(classifiers, search_space):
         if clf_name == 'ECODClassifier':
             if search_space == "sp1":
                 from pyod_models.sp1.ecod import ECODClassifier
-            if search_space == "sp2":
+            elif search_space == "sp2":
                 from pyod_models.sp2.ecod import ECODClassifier
             else:
                 from pyod_models.default.ecod import ECODClassifier
@@ -89,7 +89,7 @@ def add_to_autosklearn_pipeline(classifiers, search_space):
         if clf_name == 'HBOSClassifier':
             if search_space == "sp1":
                 from pyod_models.sp1.hbos import HBOSClassifier
-            if search_space == "sp2":
+            elif search_space == "sp2":
                 from pyod_models.sp2.hbos import HBOSClassifier
             else:
                 from pyod_models.default.hbos import HBOSClassifier
@@ -97,7 +97,7 @@ def add_to_autosklearn_pipeline(classifiers, search_space):
         if clf_name == 'IForestClassifier':
             if search_space == "sp1":
                 from pyod_models.sp1.iforest import IForestClassifier
-            if search_space == "sp2":
+            elif search_space == "sp2":
                 from pyod_models.sp2.iforest import IForestClassifier
             else:
                 from pyod_models.default.iforest import IForestClassifier
@@ -105,7 +105,7 @@ def add_to_autosklearn_pipeline(classifiers, search_space):
         if clf_name == 'KNNClassifier':
             if search_space == "sp1":
                 from pyod_models.sp1.knn import KNNClassifier
-            if search_space == "sp2":
+            elif search_space == "sp2":
                 from pyod_models.sp2.knn import KNNClassifier
             else:
                 from pyod_models.default.knn import KNNClassifier
@@ -113,7 +113,7 @@ def add_to_autosklearn_pipeline(classifiers, search_space):
         if clf_name == 'LMDDClassifier':
             if search_space == "sp1":
                 from pyod_models.sp1.lmdd import LMDDClassifier
-            if search_space == "sp2":
+            elif search_space == "sp2":
                 from pyod_models.sp2.lmdd import LMDDClassifier
             else:
                 from pyod_models.default.lmdd import LMDDClassifier
@@ -121,7 +121,7 @@ def add_to_autosklearn_pipeline(classifiers, search_space):
         if clf_name == 'LOFClassifier':
             if search_space == "sp1":
                 from pyod_models.sp1.lof import LOFClassifier
-            if search_space == "sp2":
+            elif search_space == "sp2":
                 from pyod_models.sp2.lof import LOFClassifier
             else:
                 from pyod_models.default.lof import LOFClassifier
@@ -129,7 +129,7 @@ def add_to_autosklearn_pipeline(classifiers, search_space):
         if clf_name == 'MCDClassifier':
             if search_space == "sp1":
                 from pyod_models.sp1.mcd import MCDClassifier
-            if search_space == "sp2":
+            elif search_space == "sp2":
                 from pyod_models.sp2.mcd import MCDClassifier
             else:
                 from pyod_models.default.mcd import MCDClassifier
@@ -137,7 +137,7 @@ def add_to_autosklearn_pipeline(classifiers, search_space):
         if clf_name == 'OCSVMClassifier':
             if search_space == "sp1":
                 from pyod_models.sp1.ocsvm import OCSVMClassifier
-            if search_space == "sp2":
+            elif search_space == "sp2":
                 from pyod_models.sp2.ocsvm import OCSVMClassifier
             else:
                 from pyod_models.default.ocsvm import OCSVMClassifier
@@ -145,7 +145,7 @@ def add_to_autosklearn_pipeline(classifiers, search_space):
         if clf_name == 'PCAClassifier':
             if search_space == "sp1":
                 from pyod_models.sp1.pca import PCAClassifier
-            if search_space == "sp2":
+            elif search_space == "sp2":
                 from pyod_models.sp2.pca import PCAClassifier
             else:
                 from pyod_models.default.pca import PCAClassifier
@@ -153,7 +153,7 @@ def add_to_autosklearn_pipeline(classifiers, search_space):
         if clf_name == 'RODClassifier':
             if search_space == "sp1":
                 from pyod_models.sp1.rod import RODClassifier
-            if search_space == "sp2":
+            elif search_space == "sp2":
                 from pyod_models.sp2.rod import RODClassifier
             else:
                 from pyod_models.default.rod import RODClassifier
@@ -161,7 +161,7 @@ def add_to_autosklearn_pipeline(classifiers, search_space):
         if clf_name == 'SOSClassifier':
             if search_space == "sp1":
                 from pyod_models.sp1.sos import SOSClassifier
-            if search_space == "sp2":
+            elif search_space == "sp2":
                 from pyod_models.sp2.sos import SOSClassifier
             else:
                 from pyod_models.default.sos import SOSClassifier
