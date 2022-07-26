@@ -2,7 +2,6 @@ import os
 import json
 import time
 import numpy as np
-import pandas as pd
 from autosklearn.pipeline.components.classification import add_classifier
 
 
@@ -24,16 +23,14 @@ def load_config_values():
         config = json.load(jsonfile)
     # Create local params
     datasets = config['datasets']
-    dataset_iter = config['dataset_iter']
+    iterations = config['iterations']
     classifiers = config['classifiers']
+    search_space = config['search_space']
+    validation_set_split_strategies = config['validation_set_split_strategies']
+    validation_set_sizes = config['validation_set_sizes']
     total_budget = config['total_budget']
     per_run_budget = config['per_run_budget']
-    v_strategy_default_flag = bool(config['v_strategy_default_flag'])
-    v_size_default_flag = bool(config['v_size_default_flag'])
-    if config['output_dir']:
-        output_dir = config['output_dir']
-    else:
-        output_dir = time.strftime("%Y%m%d_%H%M%S")
+    output_dir = time.strftime("%Y%m%d_%H%M%S")
     # Check if directory already exists
     output_dir_path = os.path.join(os.path.dirname(
         __file__), 'output', output_dir)
@@ -41,13 +38,12 @@ def load_config_values():
         raise ValueError(
             "Output directory `{}` already exists.".format(output_dir))
     # Return params
-    return datasets, dataset_iter, \
-        classifiers, total_budget, per_run_budget, \
-        v_strategy_default_flag, v_size_default_flag, \
-        output_dir
+    return datasets, iterations, classifiers, search_space, \
+        validation_set_split_strategies, validation_set_sizes, \
+        total_budget, per_run_budget, output_dir
 
 
-def add_to_autosklearn_pipeline(classifiers):
+def add_to_autosklearn_pipeline(classifiers, search_space):
     """
     Function that imports the provided PyOD models
     and adds them to Aut-Sklearn.
@@ -59,46 +55,116 @@ def add_to_autosklearn_pipeline(classifiers):
     """
     for clf_name in classifiers:
         if clf_name == 'ABODClassifier':
-            from pyod_models.abod import ABODClassifier
+            if search_space == "sp1":
+                from pyod_models.sp1.abod import ABODClassifier
+            if search_space == "sp2":
+                from pyod_models.sp2.abod import ABODClassifier
+            else:
+                from pyod_models.default.abod import ABODClassifier
             add_classifier(ABODClassifier)
         if clf_name == 'CBLOFClassifier':
-            from pyod_models.cblof import CBLOFClassifier
+            if search_space == "sp1":
+                from pyod_models.sp1.cblof import CBLOFClassifier
+            if search_space == "sp2":
+                from pyod_models.sp2.cblof import CBLOFClassifier
+            else:
+                from pyod_models.default.cblof import CBLOFClassifier
             add_classifier(CBLOFClassifier)
         if clf_name == 'COPODClassifier':
-            from pyod_models.copod import COPODClassifier
+            if search_space == "sp1":
+                from pyod_models.sp1.copod import COPODClassifier
+            if search_space == "sp2":
+                from pyod_models.sp2.copod import COPODClassifier
+            else:
+                from pyod_models.default.copod import COPODClassifier
             add_classifier(COPODClassifier)
         if clf_name == 'ECODClassifier':
-            from pyod_models.ecod import ECODClassifier
+            if search_space == "sp1":
+                from pyod_models.sp1.ecod import ECODClassifier
+            if search_space == "sp2":
+                from pyod_models.sp2.ecod import ECODClassifier
+            else:
+                from pyod_models.default.ecod import ECODClassifier
             add_classifier(ECODClassifier)
         if clf_name == 'HBOSClassifier':
-            from pyod_models.hbos import HBOSClassifier
+            if search_space == "sp1":
+                from pyod_models.sp1.hbos import HBOSClassifier
+            if search_space == "sp2":
+                from pyod_models.sp2.hbos import HBOSClassifier
+            else:
+                from pyod_models.default.hbos import HBOSClassifier
             add_classifier(HBOSClassifier)
         if clf_name == 'IForestClassifier':
-            from pyod_models.iforest import IForestClassifier
+            if search_space == "sp1":
+                from pyod_models.sp1.iforest import IForestClassifier
+            if search_space == "sp2":
+                from pyod_models.sp2.iforest import IForestClassifier
+            else:
+                from pyod_models.default.iforest import IForestClassifier
             add_classifier(IForestClassifier)
         if clf_name == 'KNNClassifier':
-            from pyod_models.knn import KNNClassifier
+            if search_space == "sp1":
+                from pyod_models.sp1.knn import KNNClassifier
+            if search_space == "sp2":
+                from pyod_models.sp2.knn import KNNClassifier
+            else:
+                from pyod_models.default.knn import KNNClassifier
             add_classifier(KNNClassifier)
         if clf_name == 'LMDDClassifier':
-            from pyod_models.lmdd import LMDDClassifier
+            if search_space == "sp1":
+                from pyod_models.sp1.lmdd import LMDDClassifier
+            if search_space == "sp2":
+                from pyod_models.sp2.lmdd import LMDDClassifier
+            else:
+                from pyod_models.default.lmdd import LMDDClassifier
             add_classifier(LMDDClassifier)
         if clf_name == 'LOFClassifier':
-            from pyod_models.lof import LOFClassifier
+            if search_space == "sp1":
+                from pyod_models.sp1.lof import LOFClassifier
+            if search_space == "sp2":
+                from pyod_models.sp2.lof import LOFClassifier
+            else:
+                from pyod_models.default.lof import LOFClassifier
             add_classifier(LOFClassifier)
         if clf_name == 'MCDClassifier':
-            from pyod_models.mcd import MCDClassifier
+            if search_space == "sp1":
+                from pyod_models.sp1.mcd import MCDClassifier
+            if search_space == "sp2":
+                from pyod_models.sp2.mcd import MCDClassifier
+            else:
+                from pyod_models.default.mcd import MCDClassifier
             add_classifier(MCDClassifier)
         if clf_name == 'OCSVMClassifier':
-            from pyod_models.ocsvm import OCSVMClassifier
+            if search_space == "sp1":
+                from pyod_models.sp1.ocsvm import OCSVMClassifier
+            if search_space == "sp2":
+                from pyod_models.sp2.ocsvm import OCSVMClassifier
+            else:
+                from pyod_models.default.ocsvm import OCSVMClassifier
             add_classifier(OCSVMClassifier)
         if clf_name == 'PCAClassifier':
-            from pyod_models.pca import PCAClassifier
+            if search_space == "sp1":
+                from pyod_models.sp1.pca import PCAClassifier
+            if search_space == "sp2":
+                from pyod_models.sp2.pca import PCAClassifier
+            else:
+                from pyod_models.default.pca import PCAClassifier
             add_classifier(PCAClassifier)
         if clf_name == 'RODClassifier':
-            from pyod_models.rod import RODClassifier
+            if search_space == "sp1":
+                from pyod_models.sp1.rod import RODClassifier
+            if search_space == "sp2":
+                from pyod_models.sp2.rod import RODClassifier
+            else:
+                from pyod_models.default.rod import RODClassifier
             add_classifier(RODClassifier)
         if clf_name == 'SOSClassifier':
-            from pyod_models.sos import SOSClassifier
+            if search_space == "sp1":
+                from pyod_models.sp1.sos import SOSClassifier
+            if search_space == "sp2":
+                from pyod_models.sp2.sos import SOSClassifier
+            else:
+                from pyod_models.default.sos import SOSClassifier
             add_classifier(SOSClassifier)
 
 
@@ -169,49 +235,3 @@ def train_valid_split(labels, validation_strategy='stratified',
 
     # Return indices
     return idx_train_val
-
-
-def get_validation_strategy_list(default=True):
-    """
-    Function that takes the hypothesis number and
-    returns a list of values for the validation 
-    strategy to be used in the search.
-
-    Args:
-        default (boolean): whether to use one or both
-        strategy values
-
-    Returns:
-        (list): A list of possible validation strategies
-
-    """
-    if default:
-        return ['stratified', 'balanced']
-    else:
-        return ['stratified']
-
-
-def get_validation_size_list(dataset, iter=1, default=True):
-    """
-    Function that takes the name of the dataset and the
-    hypothesis number and returns a list of values for
-    the validation set size to be used in the search.
-
-    Args:
-        dataset (str): The name of the dataset
-        h_num (string): hypothesis number {0, 1, 2, 3}
-        default (boolean): Whether to return the default
-        value
-
-    Returns:
-        (list): A list of possible validation set sizes
-
-    """
-    if default:
-        return [20, 50, 100, 200]
-    else:
-        dataset_dir = os.path.join(os.path.dirname(
-            __file__), 'data/processed/' + dataset + '/iter'+str(iter))
-        y_train = pd.read_csv(os.path.join(dataset_dir, 'y_train.csv'))
-        size = round(0.3 * y_train.shape[0])
-        return [size]
