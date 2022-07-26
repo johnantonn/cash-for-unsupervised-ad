@@ -50,6 +50,7 @@ def add_to_autosklearn_pipeline(classifiers, search_space):
     Args:
         classifiers (list): the list of classifiers
         to add
+        search_space (string): sp1, sp2 or default
     Returns:
         None
     """
