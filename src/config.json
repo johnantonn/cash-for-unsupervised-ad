@@ -2,12 +2,22 @@
     "datasets": [
         "ALOI",
         "Annthyroid",
+        "Arrhythmia",
         "Cardiotocography",
-        "KDDCup99",
-        "SpamBase",
-        "Waveform"
+        "SpamBase"
     ],
-    "dataset_iter": 1,
+    "iterations": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10
+    ],
     "classifiers": [
         "CBLOFClassifier",
         "COPODClassifier",
@@ -15,9 +25,13 @@
         "KNNClassifier",
         "LOFClassifier"
     ],
+    "search_space": "sp1",
+    "validation_set_split_strategies": [
+        "balanced"
+    ],
+    "validation_set_sizes": [
+        200
+    ],
     "total_budget": 600,
-    "per_run_budget": 30,
-    "v_strategy_default_flag": 1,
-    "v_size_default_flag": 1,
-    "output_dir": "all_600"
+    "per_run_budget": 30
 }
