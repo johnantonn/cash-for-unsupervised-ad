@@ -1,7 +1,8 @@
-# Systematic evaluation of CASH optimization for unsupervised anomaly detection
-**Thesis** repository for the **[Master of Artificial Intelligence](https://wms.cs.kuleuven.be/cs/studeren/master-artificial-intelligence)** programme at [KU Leuven](https://www.kuleuven.be/english/kuleuven).
+# Systematic Evaluation of CASH Search Strategies for Unsupervised Anomaly Detection
+Repository for the relevant full-paper accepted in [ECML/PKDD 2022](https://2022.ecmlpkdd.org/), and specifically for the [LIDTA-2022 workshop](https://lidta.dcc.fc.up.pt/).
 
-![image](https://user-images.githubusercontent.com/8168416/160713379-cc39a1a2-85de-434f-9ee7-4d8ff51838e1.png)
+**Note**: This repository initially served as the code repo for my thesis in **[Master of Artificial Intelligence](https://wms.cs.kuleuven.be/cs/studeren/master-artificial-intelligence)** programme at [KU Leuven](https://www.kuleuven.be/english/kuleuven) but it was later modified/extended to accommodate the relevant content of the LIDTA-2022 full-paper submission.
+
 
 ## Description
 The aim of the thesis is to evaluate the CASH optimization problem for unsupervised anomaly detection by systematically experimenting on different types and sizes of the validation set and compare the performance for the below search strategies:
@@ -9,13 +10,11 @@ The aim of the thesis is to evaluate the CASH optimization problem for unsupervi
 * Uniform Exploration
 * Bayesian Optimization (SMAC)
 
+## Contents
+TODO
 
-## Contributions
-Several packages exist for solving CASH optimization, however the unsupervised anomaly detection setting has not been explored thoroughly to date. More specifically, there have been a number of research efforts that focus on specific characteristics of the anomaly detection setting, e.g. time-series data, purely supvervised approaches.
-
-This work instead assumes the presence of only a small labeled validation set that is used for optimization and evaluation purposes, while anomaly detection model training is unsupervised. This thesis contributes to the current state-of-the-art as follows:
- - Systematic experimental evaluation of CASH algorithms in the context of unsupervised anomaly detection by careful testing a number of hypotheses surrounding the structure of the validation set.
- - Extending the core implementation of **Auto-Sklearn** by incorporating unsupervised anomaly detection algorithms from **PyOD** and evaluate their performance.
+## How to run the code
+TODO
 
 ## External links
 
