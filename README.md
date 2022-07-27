@@ -18,14 +18,11 @@ TODO
 
 ## External links
 
-### Auto-Sklearn
-The current implementation can be found [here](https://github.com/automl/auto-sklearn).
-
-### PyOD
-The current implementation can be found [here](https://pyod.readthedocs.io/en/latest/index.html).
-
-### Datasets
-A commonly used set of datasets in the literature can be found [here](https://www.dbs.ifi.lmu.de/research/outlier-evaluation/DAMI/).
+| Name | Description | Link |
+|:------------- |:------------- |:-------------:|
+| Auto-Sklearn | Automated machine learning toolkit | [:link:](https://www.coursera.org/account/accomplishments/certificate/RMLFKH4CJZM4) |
+| PyOD | Python library for anomaly detection | [:link:](https://pyod.readthedocs.io/en/latest/index.html) |
+| Datasets | Anomaly detection datasets used in the literature | [:link:](https://pyod.readthedocs.io/en/latest/index.html) |
 
 ## License
 Copyright © 2022 Ioannis Antoniadis
