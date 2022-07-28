@@ -22,7 +22,7 @@ TODO
 |:------------- |:------------- |:-------------:|
 | Auto-Sklearn | Automated machine learning toolkit | [:link:](https://www.coursera.org/account/accomplishments/certificate/RMLFKH4CJZM4) |
 | PyOD | Python library for anomaly detection | [:link:](https://pyod.readthedocs.io/en/latest/index.html) |
-| Datasets | Anomaly detection datasets used in the literature | [:link:](https://pyod.readthedocs.io/en/latest/index.html) |
+| Datasets | Anomaly detection datasets | [:link:](https://pyod.readthedocs.io/en/latest/index.html) |
 
 ## License
 Copyright © 2022 Ioannis Antoniadis
