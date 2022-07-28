@@ -5,10 +5,7 @@ Repository for the relevant full-paper accepted in [ECML/PKDD 2022](https://2022
 
 
 ## Description
-The aim of the thesis is to evaluate the CASH optimization problem for unsupervised anomaly detection by systematically experimenting on different types and sizes of the validation set and compare the performance for the below search strategies:
-* Random Search
-* Uniform Exploration
-* Bayesian Optimization (SMAC)
+TODO
 
 ## Contents
 TODO
