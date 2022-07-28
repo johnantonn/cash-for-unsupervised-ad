@@ -1,23 +1,11 @@
 # VS Code
 .vscode
 
-# Input files
-**/data
-
 # Output files
 **/output
-
-# Results from AutoSklearn runs
-**/results
-
-# Exceptions
-!data/.gitkeep
 
 # __pycache__
 **/__pycache__/
 
 # pynb checkpoints
 **/.ipynb_checkpoints/
-
-# Images
-**/images

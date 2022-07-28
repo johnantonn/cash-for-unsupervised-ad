@@ -1,0 +1,9 @@
+dataset_name,dataset_iter,search_type,num_classifiers,validation_strategy,validation_size,total_budget,per_run_budget
+Waveform,1,ue,5,balanced,100,600,30
+Waveform,1,random,1,balanced,100,120,30
+Waveform,1,random,1,balanced,100,120,30
+Waveform,1,random,1,balanced,100,120,30
+Waveform,1,random,1,balanced,100,120,30
+Waveform,1,random,1,balanced,100,120,30
+Waveform,1,random,5,balanced,100,600,30
+Waveform,1,smac,5,balanced,100,600,30
