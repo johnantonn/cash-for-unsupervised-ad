@@ -1,5 +1,5 @@
 # Systematic Evaluation of CASH Search Strategies for Unsupervised Anomaly Detection
-Repository for the relevant full-paper accepted in [ECML/PKDD 2022](https://2022.ecmlpkdd.org/), and specifically for the [LIDTA-2022 workshop](https://lidta.dcc.fc.up.pt/).
+Repository for the relevant full-paper accepted at the [LIDTA-2022 workshop](https://lidta.dcc.fc.up.pt/) of the [ECML/PKDD 2022](https://2022.ecmlpkdd.org/).
 
 **Note**: This repository initially served as the code repo for my thesis in **[Master of Artificial Intelligence](https://wms.cs.kuleuven.be/cs/studeren/master-artificial-intelligence)** programme at [KU Leuven](https://www.kuleuven.be/english/kuleuven) but it was later modified/extended to accommodate the relevant content of the LIDTA-2022 full-paper submission.
 
