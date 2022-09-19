@@ -13,7 +13,16 @@ The code provides an experimental evaluation of how the structure of the validat
 - `results` directory contains the raw results of the paper for the different CASH search spaces.
 
 ## How to run the code
-Provide the experiment parameters in `src/config.json` and run `auto_ad_main.py`.
+Provide the experiment parameters in `src/config.json`:
+- `datasets`: list of datasets
+- `iterations`: list of iterations, i.e. different versions of the train/test splits (1, 2, ..., 10)
+- `classifiers`: list of anomaly detectors
+- `search_space`: version of search space (sp1, sp2 or default)
+- `validation_set_split_strategies`: list of strategies to split the validation set (stratified, balanced)
+- `validation_set_sizes`: list of sizes for the validation set (20, 50, 100, 200)
+- `total_budget`: total duration of a single search
+- `per_run_budget`: minimum duration of a single run
+and run `auto_ad_main.py`.
 
 ## External links
 
